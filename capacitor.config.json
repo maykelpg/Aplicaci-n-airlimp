@@ -1,0 +1,6 @@
+{
+  "appId": "es.airlimp.app",
+  "appName": "Air-Limp",
+  "webDir": "www",
+  "android": { "backgroundColor": "#F6FAF9" }
+}

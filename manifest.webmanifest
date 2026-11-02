@@ -1,0 +1,16 @@
+{
+  "name": "Air-Limp Climatización",
+  "short_name": "Air-Limp",
+  "description": "Presupuestos, averías, citas y mantenimiento de tu climatización.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6FAF9",
+  "theme_color": "#0F2A30",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

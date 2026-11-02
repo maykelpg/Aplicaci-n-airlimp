@@ -1,0 +1,1601 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Air-Limp</title>
+<meta name="theme-color" content="#0F2A30">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script>window.APP_MODE='cliente'</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F2A30; --slate:#1D4650; --deep:#163840;
+  --paper:#F6FAF9; --ice:#E4F1F0; --line:#CFE0DE; --muted:#5A7378;
+  --cold:#2AA3B6; --cold-soft:#D3EEF1; --heat:#EC963A; --heat-soft:#FCE9D3;
+  --ok:#2E8B57; --ok-soft:#DDF1E5; --warn:#C7502E; --warn-soft:#FBE6DF;
+  --flow:var(--cold); --flow-soft:var(--cold-soft);
+  --r-s:10px; --r-m:16px; --r-l:26px;
+  --display:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Figtree',system-ui,sans-serif;
+}
+body.heat{--flow:var(--heat);--flow-soft:var(--heat-soft)}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--body);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.5;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+body[data-role=empresa]{background:#EEF3F2}
+h1,h2,h3{font-family:var(--display);line-height:1.08;letter-spacing:-.015em}
+h1{font-size:clamp(2rem,7vw,3.4rem);font-weight:800}
+h2{font-size:clamp(1.45rem,4.6vw,2.1rem);font-weight:700}
+h3{font-size:1.12rem;font-weight:700}
+p{max-width:64ch}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--flow);outline-offset:2px;border-radius:6px}
+img,svg{display:block;max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+
+/* ---------- Top ---------- */
+.topwrap{position:sticky;top:env(safe-area-inset-top,0px);z-index:40}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:41;background:var(--ink)}
+body.solo::before{background:#fff}
+body.solo .banner{display:none}
+.banner{background:var(--ink);color:#fff;font-size:.8rem;padding:6px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.banner .lbl{color:#9fbcc0}
+@media(max-width:520px){.banner .lbl{display:none}.banner{gap:6px;padding:6px 8px}.roles button{padding:5px 9px}}
+.roles{display:flex;background:rgba(255,255,255,.1);border-radius:999px;padding:2px}
+.roles button{border:0;background:none;color:#cfe2e4;font-weight:700;font-size:.8rem;padding:5px 12px;border-radius:999px}
+.roles button.on{background:#fff;color:var(--ink)}
+.tourbtn{border:1px solid rgba(255,255,255,.35);background:none;color:#fff;border-radius:999px;font-weight:700;font-size:.8rem;padding:4px 12px}
+.tourbtn i{font-style:normal;background:var(--heat);color:var(--ink);border-radius:999px;padding:0 6px;margin-left:4px}
+.top{background:rgba(246,250,249,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:none}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
+body[data-role=cliente] .hc,body[data-role=empresa] .he,body[data-role=portada] .hp{display:block}
+.he{background:#fff}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left}
+.brand .logo{height:38px;width:auto;max-width:150px;object-fit:contain}
+.brand b{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+.brand .tag{font-size:.72rem;font-weight:700;background:var(--ink);color:#fff;padding:3px 9px;border-radius:999px}
+.logo-fallback{display:none}
+.top nav{display:none;gap:2px}
+.top nav button{background:none;border:0;padding:8px 11px;border-radius:999px;font-weight:600;color:var(--slate);font-size:.93rem}
+.top nav button.on{background:var(--ice);color:var(--ink)}
+.iconbtn{background:var(--ice);border:0;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none}
+.iconbtn svg{width:20px;height:20px}
+.badge{position:absolute;top:-2px;right:-2px;background:var(--warn);color:#fff;font-size:.68rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.badge:empty{display:none}
+.call{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#fff;text-decoration:none;padding:9px 13px;border-radius:999px;font-weight:600;font-size:.9rem;white-space:nowrap}
+.call .num{display:none}
+.lang{background:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:700;font-size:.8rem}
+@media(min-width:520px){.call .num{display:inline}}
+@media(min-width:960px){.top nav{display:flex}.hide-desk{display:none}}
+
+/* ---------- Tabs ---------- */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top:1px solid var(--line);display:none;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+body[data-role=cliente] .tabs.c,body[data-role=empresa] .tabs.e{display:grid}
+.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;font-weight:600;color:var(--muted);padding:4px 0;position:relative}
+.tabs button svg{width:24px;height:24px}
+.tabs button.on{color:var(--ink)}
+.tabs .plus{top:-16px}
+.tabs .plus i{width:54px;height:54px;border-radius:50%;background:var(--flow);color:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(15,42,48,.25);transition:background .4s}
+.tabs.e .plus i{background:var(--ink)}
+.tabs .badge{top:0;right:calc(50% - 22px)}
+@media(min-width:960px){.tabs{display:none!important}body{padding-bottom:0}}
+
+/* ---------- Floating ---------- */
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(96px + env(safe-area-inset-bottom));z-index:45;display:none;flex-direction:column;gap:10px}
+body[data-role=cliente] .fab{display:flex}
+.fab button,.fab a{width:54px;height:54px;border-radius:50%;border:0;display:grid;place-items:center;box-shadow:0 8px 20px rgba(15,42,48,.25);text-decoration:none}
+.fab .chatb{background:var(--ink);color:#fff}
+.fab .wa{background:#25D366;color:#fff}
+.fab svg{width:26px;height:26px}
+@media(min-width:960px){.fab{bottom:24px}}
+
+/* ---------- Views ---------- */
+.view{display:none;padding:22px 0 40px}
+.view.on{display:block}
+.sec{margin-top:40px}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.link{background:none;border:0;color:var(--slate);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0}
+.narrow{max-width:660px;margin:0 auto}
+.intro{margin:8px 0 18px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:13px 20px;font-weight:700;text-decoration:none;font-size:1rem;line-height:1.2}
+.btn-main{background:var(--ink);color:#fff}
+.btn-flow{background:var(--flow);color:#fff;transition:background .4s}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-wa{background:#25D366;color:#fff}
+.btn-sm{padding:8px 13px;font-size:.88rem}
+.btn-block{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Portada */
+.cover{display:grid;gap:20px}
+.cover h1{max-width:16ch}
+.faces{display:grid;gap:14px;margin-top:8px}
+@media(min-width:760px){.faces{grid-template-columns:1fr 1fr}}
+.face{border-radius:var(--r-l);padding:22px;display:grid;gap:12px;align-content:start;position:relative;overflow:hidden}
+.face.c{background:var(--cold-soft)}
+.face.e{background:var(--ink);color:#fff}
+.face ul{padding-left:18px;display:grid;gap:4px}
+.face.e ul{color:#c9dcdf}
+.phone{width:120px;height:200px;border-radius:22px;border:5px solid var(--ink);background:#fff;position:absolute;right:-20px;top:-26px;transform:rotate(10deg);opacity:.9}
+.face.e .phone{border-color:#2b5a66;background:#163840}
+.vs{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--r-m);overflow:hidden;font-size:.92rem}
+.vs th,.vs td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.vs th{background:var(--ice);font-weight:700}
+.vs td:first-child{font-weight:700}
+.vs td.old{color:var(--muted)}
+.tourlist{display:grid;gap:8px}
+.tstep{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:12px}
+.tstep .n{width:34px;height:34px;border-radius:50%;background:var(--ice);display:grid;place-items:center;font-weight:800;flex:none}
+.tstep.done .n{background:var(--ok);color:#fff}
+.tstep .who{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--cold-soft)}
+.tstep .who.e{background:var(--ink);color:#fff}
+
+/* Hero */
+.hero{display:grid;gap:22px;align-items:center}
+@media(min-width:900px){.hero{grid-template-columns:1.05fr 1fr;gap:40px;padding-top:10px}}
+.hero p.lead{font-size:1.1rem;color:var(--slate);margin-top:14px}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.stage{position:relative;background:var(--flow-soft);border-radius:var(--r-l);overflow:hidden;transition:background .5s;aspect-ratio:1/1;max-height:500px}
+.stage svg.house{position:absolute;inset:0;width:100%;height:100%}
+.flowline{stroke:var(--flow);stroke-width:5;fill:none;stroke-linecap:round;stroke-dasharray:14 18;animation:flow 2.4s linear infinite;transition:stroke .5s}
+@keyframes flow{to{stroke-dashoffset:-64}}
+@media(prefers-reduced-motion:reduce){.flowline{animation:none}}
+.dial{position:absolute;right:14px;bottom:14px;background:#fff;border-radius:22px;padding:12px 14px;box-shadow:0 10px 30px rgba(15,42,48,.15);display:grid;gap:8px;min-width:164px}
+.dial .temp{font-family:var(--display);font-weight:800;font-size:2.5rem;line-height:1;text-align:center}
+.dial .temp small{font-size:1rem;font-weight:600;color:var(--muted)}
+.dial .r{display:flex;gap:6px;justify-content:center}
+.dial .r button{border:1.5px solid var(--line);background:#fff;border-radius:999px;min-width:40px;height:36px;font-weight:700}
+.seg{display:flex;background:var(--ice);border-radius:999px;padding:3px}
+.seg button{flex:1;border:0;background:none;border-radius:999px;padding:7px 10px;font-weight:700;font-size:.86rem;color:var(--muted);white-space:nowrap}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+.promo{border-radius:var(--r-l);background:var(--heat-soft);padding:16px 18px;display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.promo svg{width:46px;height:46px;flex:none}
+.promo b{font-family:var(--display);font-size:1.15rem;display:block}
+
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:26px}
+@media(min-width:700px){.quick{grid-template-columns:repeat(4,1fr)}}
+.qa{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:14px;text-align:left;display:grid;gap:6px;align-content:start}
+.qa svg{width:30px;height:30px;color:var(--slate)}
+.qa b{font-size:1rem}
+.qa span{font-size:.83rem;color:var(--muted);line-height:1.3}
+.qa.urgent{background:var(--ink);color:#fff;border-color:var(--ink)}
+.qa.urgent svg{color:var(--heat)}.qa.urgent span{color:#b9cfd2}
+
+.paths{display:grid;gap:12px}
+@media(min-width:700px){.paths{grid-template-columns:1fr 1fr}}
+.path{border-radius:var(--r-l);padding:22px;display:grid;gap:10px;text-align:left;border:0;min-height:200px;align-content:end;position:relative;overflow:hidden}
+.path.home{background:var(--heat-soft)}
+.path.biz{background:var(--slate);color:#fff}
+.path svg.ill{position:absolute;right:-6px;top:-6px;width:140px}
+.path ul{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.path li{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.65)}
+.path.biz li{background:rgba(255,255,255,.12)}
+
+.svc-grid{display:grid;gap:12px}
+@media(min-width:640px){.svc-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:960px){.svc-grid{grid-template-columns:1fr 1fr 1fr}}
+.svc{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:16px;display:grid;grid-template-columns:64px 1fr;gap:14px;text-align:left;align-items:start}
+.ic{width:64px;height:64px;border-radius:14px;background:var(--ice);display:grid;place-items:center;flex:none}
+.ic svg{width:44px;height:44px}
+.svc p{font-size:.9rem;color:var(--muted);margin-top:4px}
+.svc .for{font-size:.75rem;font-weight:700;color:var(--slate);margin-top:8px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:.9rem;white-space:nowrap}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border-radius:var(--r-m);overflow:hidden;border:1px solid var(--line)}
+@media(min-width:700px){.facts{grid-template-columns:repeat(4,1fr)}}
+.fact{background:#fff;padding:18px}
+.fact b{font-family:var(--display);font-size:1.8rem;font-weight:800;display:block;line-height:1}
+.fact span{font-size:.85rem;color:var(--muted)}
+
+.plans{display:grid;gap:12px}
+@media(min-width:760px){.plans{grid-template-columns:repeat(3,1fr)}}
+.plan{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-l);padding:20px;display:grid;gap:10px;align-content:start}
+.plan.star{border-color:var(--ink);box-shadow:0 10px 30px rgba(15,42,48,.1)}
+.plan .price{font-family:var(--display);font-size:2.2rem;font-weight:800;line-height:1}
+.plan .price small{font-size:.95rem;font-weight:600;color:var(--muted)}
+.plan ul{padding-left:18px;color:var(--slate);font-size:.93rem;display:grid;gap:4px}
+
+.demo-tag{display:inline-block;font-size:.72rem;font-weight:700;background:var(--heat-soft);color:#8a4b0d;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill{font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--ice);white-space:nowrap;display:inline-block}
+.pill.ok{background:var(--ok-soft);color:#1f6a40}.pill.warn{background:var(--warn-soft);color:#8d2d12}.pill.dark{background:var(--ink);color:#fff}.pill.heat{background:var(--heat-soft);color:#8a4b0d}
+
+/* Reviews */
+.reviews{display:grid;gap:12px}
+@media(min-width:760px){.reviews{grid-template-columns:repeat(3,1fr)}}
+.rev{background:#fff;border-radius:var(--r-m);padding:16px;border:1px solid var(--line);display:grid;gap:8px;align-content:start}
+.stars{color:var(--heat);letter-spacing:2px}
+.reply{background:var(--ice);border-radius:var(--r-s);padding:10px 12px;font-size:.88rem}
+.starpick{display:flex;gap:4px}
+.starpick button{border:0;background:none;font-size:2rem;line-height:1;color:var(--line);padding:0 2px}
+.starpick button.on{color:var(--heat)}
+.avg{display:flex;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:var(--r-l);padding:18px;margin-bottom:16px}
+.avg b{font-family:var(--display);font-size:3rem;font-weight:800;line-height:1}
+
+/* Forms */
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r-l);padding:20px}
+.steps{display:flex;gap:6px;margin:14px 0 20px}
+.steps i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--flow)}
+.opts{display:grid;gap:10px}
+@media(min-width:640px){.opts.two{grid-template-columns:1fr 1fr}}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:var(--r-m);padding:14px;width:100%}
+.opt svg{width:36px;height:36px;flex:none}
+.opt.on{border-color:var(--ink);background:var(--ice)}
+.opt small{display:block;color:var(--muted);font-size:.82rem}
+label.f,.f{display:grid;gap:6px;font-weight:600;font-size:.92rem;margin-bottom:14px}
+input[type=text],input[type=tel],input[type=date],input[type=time],input[type=number],input[type=email],input[type=password],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:var(--r-s);padding:12px;background:#fff;font-size:1rem}
+textarea{min-height:86px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--slate)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:.92rem;margin-bottom:14px}
+.check input{width:20px;height:20px;flex:none;margin-top:2px}
+.rangeval{font-family:var(--display);font-weight:800;font-size:1.8rem}
+.nav-row{display:flex;gap:10px;margin-top:18px}
+.nav-row .btn{flex:1}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumbs img{width:70px;height:70px;object-fit:cover;border-radius:10px}
+.estimate{background:var(--ink);color:#fff;border-radius:var(--r-l);padding:22px}
+.estimate .big{font-family:var(--display);font-size:2.3rem;font-weight:800;line-height:1.05;margin:6px 0}
+.estimate p{color:#b9cfd2;font-size:.9rem}
+.fin{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.fin div{background:rgba(255,255,255,.08);border-radius:var(--r-s);padding:10px;text-align:center}
+.fin b{font-family:var(--display);font-size:1.3rem;display:block}
+.urg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.urg button{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-s);padding:10px 6px;font-weight:700;font-size:.88rem}
+.urg button.on{border-color:var(--warn);background:var(--warn-soft);color:#8d2d12}
+
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.day{flex:none;width:64px;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-m);padding:8px 0;text-align:center}
+.day b{font-family:var(--display);font-size:1.4rem;display:block}
+.day small{font-size:.72rem;color:var(--muted);text-transform:capitalize}
+.day.on{background:var(--ink);color:#fff;border-color:var(--ink)}.day.on small{color:#b9cfd2}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.slot{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-s);padding:11px 0;font-weight:700}
+.slot.on{background:var(--flow);color:#fff;border-color:var(--flow)}
+.slot:disabled{text-decoration:line-through;opacity:.4}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:16px;display:grid;gap:10px}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.meter{height:8px;border-radius:4px;background:var(--ice);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok)}
+.meter i.late{background:var(--warn)}
+.empty{text-align:center;padding:30px 16px;border:2px dashed var(--line);border-radius:var(--r-l);display:grid;gap:8px;justify-items:center}
+.empty svg{width:80px}
+.docs{display:flex;gap:8px;flex-wrap:wrap}
+.doc{display:flex;gap:6px;align-items:center;background:var(--ice);border-radius:var(--r-s);padding:6px 10px;font-size:.82rem;font-weight:600}
+.doc img{width:28px;height:28px;object-fit:cover;border-radius:6px}
+
+/* Tracking timeline */
+.track{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0}
+.track div{display:grid;gap:6px;justify-items:center;text-align:center;font-size:.72rem;font-weight:600;color:var(--muted);position:relative}
+.track div::before{content:'';position:absolute;top:9px;left:-50%;right:50%;height:3px;background:var(--line)}
+.track div:first-child::before{display:none}
+.track i{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--line);position:relative;z-index:1}
+.track .done{color:var(--ink)}.track .done i{background:var(--ok);border-color:var(--ok)}.track .done::before{background:var(--ok)}
+.track .now i{background:var(--flow);border-color:var(--flow);box-shadow:0 0 0 5px var(--flow-soft)}
+
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.calc-out div{background:var(--flow-soft);border-radius:var(--r-m);padding:14px;transition:background .5s}
+.calc-out b{font-family:var(--display);font-size:1.6rem;font-weight:800;display:block;line-height:1.1}
+
+.works{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media(min-width:760px){.works{grid-template-columns:repeat(3,1fr)}}
+.work{background:#fff;border-radius:var(--r-m);overflow:hidden;border:1px solid var(--line)}
+.work svg,.work img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+.work div{padding:10px 12px}
+.work b{font-size:.92rem;display:block;line-height:1.25}
+.work span{font-size:.78rem;color:var(--muted)}
+.compare{position:relative;border-radius:var(--r-l);overflow:hidden;aspect-ratio:16/10;background:#fff;border:1px solid var(--line)}
+.compare svg{position:absolute;inset:0;width:100%;height:100%}
+.compare .after{clip-path:inset(0 0 0 var(--cut,50%))}
+.compare .bar{position:absolute;top:0;bottom:0;left:var(--cut,50%);width:3px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.1)}
+.compare .tagl,.compare .tagr{position:absolute;top:10px;font-size:.75rem;font-weight:700;background:#fff;padding:3px 10px;border-radius:999px}
+.compare .tagl{left:10px}.compare .tagr{right:10px}
+
+details{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;margin-bottom:8px}
+summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';font-size:1.3rem;line-height:1;color:var(--slate)}
+details[open] summary::after{content:'–'}
+details .body{margin-top:10px;color:var(--slate);font-size:.95rem;display:grid;gap:8px}
+details ul{padding-left:18px}
+
+.two-col{display:grid;gap:12px}
+@media(min-width:760px){.two-col{grid-template-columns:1fr 1fr}}
+.map-card{border-radius:var(--r-l);overflow:hidden;background:var(--ice);min-height:220px}
+
+/* ---------- Empresa ---------- */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:760px){.kpis{grid-template-columns:repeat(5,1fr)}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:14px;text-align:left}
+.kpi b{font-family:var(--display);font-size:2rem;font-weight:800;display:block;line-height:1}
+.kpi span{font-size:.82rem;color:var(--muted)}
+.kpi.hot{background:var(--ink);color:#fff;border-color:var(--ink)}.kpi.hot span{color:#b9cfd2}
+.req{background:#fff;border:1px solid var(--line);border-left:5px solid var(--cold);border-radius:var(--r-m);padding:14px;display:grid;gap:8px;margin-bottom:10px}
+.req.averia{border-left-color:var(--warn)}.req.cita{border-left-color:var(--heat)}.req.revision{border-left-color:var(--ok)}.req.contrato{border-left-color:var(--slate)}
+.req-top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.req .ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:640px){.req .ctrl{grid-template-columns:repeat(4,1fr)}}
+.req .ctrl select,.req .ctrl input{padding:8px 10px;font-size:.88rem}
+.req .ctrl label{display:grid;gap:3px;font-size:.72rem;font-weight:700;color:var(--muted)}
+.bars{display:grid;gap:8px}
+.bar-row{display:grid;grid-template-columns:110px 1fr 34px;gap:8px;align-items:center;font-size:.85rem}
+.bar-row .t{height:12px;border-radius:6px;background:var(--ice);overflow:hidden}
+.bar-row .t i{display:block;height:100%;background:var(--slate);border-radius:6px}
+.cols{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:10px}
+.cols div{flex:1;display:grid;gap:4px;justify-items:center;align-content:end;height:100%;font-size:.75rem;color:var(--muted)}
+.cols i{width:100%;max-width:40px;background:var(--line);border-radius:6px 6px 0 0;display:block}
+.cols div:last-child i{background:var(--flow)}
+.cols b{font-size:.8rem;color:var(--ink)}
+.dash{display:grid;gap:12px;margin-top:14px}
+@media(min-width:860px){.dash{grid-template-columns:1fr 1fr 1fr}}
+.lanes{display:grid;gap:12px}
+@media(min-width:860px){.lanes{grid-template-columns:repeat(3,1fr)}}
+.lane{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:14px;display:grid;gap:10px;align-content:start}
+.stop{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:start;font-size:.88rem}
+.stop b.h{font-family:var(--display);font-size:1rem}
+.route{background:var(--ice);border-radius:var(--r-s)}
+canvas.sig{width:100%;height:150px;border:1.5px dashed var(--slate);border-radius:var(--r-m);background:#fff;touch-action:none;display:block}
+.lines{width:100%;border-collapse:collapse;font-size:.92rem}
+.lines td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.lines input{padding:8px;font-size:.92rem}
+.lines .num{width:110px;text-align:right}
+.tot{display:flex;justify-content:space-between;font-weight:700;padding:6px 4px}
+
+/* ---------- Chat ---------- */
+.chat{position:fixed;z-index:95;inset:auto 0 0 0;height:min(86vh,680px);background:#fff;border-radius:24px 24px 0 0;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .3s ease;box-shadow:0 -10px 40px rgba(15,42,48,.2)}
+.chat.on{transform:none}
+@media(min-width:760px){.chat{left:auto;right:24px;bottom:24px;width:390px;border-radius:24px;height:600px}}
+.chat-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.chat-h .av{width:40px;height:40px;border-radius:50%;background:var(--flow-soft);display:grid;place-items:center;flex:none}
+.chat-h .av svg{width:26px;height:26px}
+.chat-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--paper)}
+.msg{max-width:85%;padding:10px 13px;border-radius:16px;font-size:.94rem;line-height:1.4}
+.msg.bot{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.me{background:var(--ink);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.msg .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.msg .acts a{border:1.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 11px;font-size:.82rem;font-weight:700;text-decoration:none;color:var(--ink)}
+.msg .acts button{border:1.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 11px;font-size:.82rem;font-weight:700}
+.typing{display:flex;gap:4px;padding:12px 14px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{50%{opacity:.25}}
+.chat-sug{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-top:1px solid var(--line)}
+.chat-sug button{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.84rem;font-weight:600}
+.chat-in{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.chat-in input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:11px 14px;font-size:1rem}
+.chat-in button{width:44px;height:44px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:grid;place-items:center;flex:none}
+
+/* ---------- Sheet + toast ---------- */
+.scrim{position:fixed;inset:0;background:rgba(15,42,48,.45);z-index:80;display:none}
+.scrim.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;transform:translateY(105%);transition:transform .3s ease}
+.sheet.on{transform:none}
+.sheet.drag{transition:none}
+@media(min-width:760px){.sheet{left:50%;width:600px;margin-left:-300px;bottom:auto;top:50%;border-radius:24px;transform:translateY(-50%) scale(.96);opacity:0;pointer-events:none;transition:.25s;padding:20px}.sheet.on{transform:translateY(-50%);opacity:1;pointer-events:auto}.sheet .grab{display:none}}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px;padding:8px 0;background-clip:content-box;box-sizing:content-box}
+.sheet ul{padding-left:20px;margin:10px 0;color:var(--slate)}
+.menu-list{display:grid;gap:6px}
+.menu-list button{text-align:left;border:0;background:var(--paper);border-radius:var(--r-m);padding:14px 16px;font-weight:700;font-size:1rem;display:flex;justify-content:space-between;align-items:center}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:18px;font-weight:600;opacity:0;transition:.3s;z-index:120;pointer-events:none;max-width:90vw;text-align:center;font-size:.93rem}
+.toast.on{opacity:1;transform:translateX(-50%)}
+footer{border-top:1px solid var(--line);padding:26px 0;margin-top:30px;font-size:.85rem;color:var(--muted)}
+footer .logo{height:42px;width:auto;margin-bottom:10px}
+#printArea{display:none}
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important;padding:30px;font-family:var(--body)}body{background:#fff;padding:0}}
+</style>
+</head>
+<body data-role="cliente">
+
+<div class="topwrap">
+  <div class="banner">
+    <span class="lbl">Demo para Air-Limp · Ver como</span>
+    <div class="roles"><button data-role-go="portada">Portada</button><button data-role-go="cliente">Cliente</button><button data-role-go="empresa">Empresa</button></div>
+    <button class="tourbtn" id="tourBtn">Recorrido <i id="tourCount">0/6</i></button>
+  </div>
+
+  <!-- Cabecera portada -->
+  <header class="top hp"><div class="wrap">
+    <button class="brand" data-go="portada"><img class="logo" src="https://airlimp.com/img/logo.png" alt="Air-Limp" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><b class="logo-fallback">Air-Limp</b></button>
+    <span class="pill dark">Propuesta</span>
+  </div></header>
+
+  <!-- Cabecera cliente -->
+  <header class="top hc"><div class="wrap">
+    <button class="brand" data-go="inicio" aria-label="Inicio"><img class="logo" src="https://airlimp.com/img/logo.png" alt="Air-Limp" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><b class="logo-fallback">Air-Limp</b></button>
+    <nav aria-label="Principal">
+      <button data-go="inicio" data-i18n="nav_inicio">Inicio</button>
+      <button data-go="servicios" data-i18n="nav_servicios">Servicios</button>
+      <button data-go="planes" data-i18n="nav_planes">Planes</button>
+      <button data-go="obras" data-i18n="nav_obras">Obras</button>
+      <button data-go="resenas" data-i18n="nav_resenas">Reseñas</button>
+      <button data-go="solicitudes" data-i18n="nav_mis">Mis cosas</button>
+      <button data-go="contacto" data-i18n="nav_contacto">Contacto</button>
+    </nav>
+    <div class="row" style="flex-wrap:nowrap">
+      <button class="lang" id="langBtn" aria-label="Cambiar idioma">EN</button>
+      <button class="iconbtn" data-go="notifs" aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="badge" id="bell"></span></button>
+      <a class="call" href="tel:+34942890424"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span class="num">942 890 424</span></a>
+    </div>
+  </div></header>
+
+  <!-- Cabecera empresa -->
+  <header class="top he"><div class="wrap">
+    <button class="brand" data-go="e-inicio"><img class="logo" src="https://airlimp.com/img/logo.png" alt="Air-Limp" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><b class="logo-fallback">Air-Limp</b><span class="tag">Panel</span></button>
+    <nav aria-label="Panel">
+      <button data-go="e-inicio">Resumen</button>
+      <button data-go="e-solicitudes">Solicitudes</button>
+      <button data-go="e-agenda">Agenda</button>
+      <button data-go="e-clientes">Clientes</button>
+      <button data-go="e-resenas">Reseñas</button>
+      <button data-go="e-contenido">Contenido</button>
+    </nav>
+    <button class="iconbtn" data-go="e-solicitudes" aria-label="Solicitudes nuevas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="badge" id="ebell"></span></button>
+  </div></header>
+</div>
+
+<main class="wrap">
+
+<!-- ================= PORTADA ================= -->
+<section class="view on" id="v-portada">
+  <div class="cover">
+    <div>
+      <h1>Nueva web y app para Air-Limp</h1>
+      <p class="muted" style="margin-top:12px;font-size:1.1rem">Una sola herramienta con dos caras: lo que ve el cliente en su móvil y lo que usa la empresa para organizar el trabajo. Todo lo que hace uno le llega al otro al momento.</p>
+    </div>
+    <div class="faces">
+      <div class="face c">
+                <h2>Visión cliente</h2>
+        <ul>
+          <li>Presupuesto con precio orientativo y financiación</li>
+          <li>Avisos de avería con fotos y guía por síntomas</li>
+          <li>Citas, seguimiento del técnico y avisos</li>
+          <li>Sus equipos, garantías, facturas y revisiones</li>
+          <li>Planes de mantenimiento y reseñas reales</li>
+          <li>Asistente que resuelve dudas 24 h</li>
+        </ul>
+        <button class="btn btn-main" data-go="inicio">Abrir la app del cliente</button>
+      </div>
+      <div class="face e">
+                <h2>Visión empresa</h2>
+        <ul>
+          <li>Todas las solicitudes en un solo sitio</li>
+          <li>Asignar técnico, hora y estado</li>
+          <li>Agenda por técnico con ruta en el mapa</li>
+          <li>Parte de trabajo con fotos y firma del cliente</li>
+          <li>Presupuestos en PDF con su logo</li>
+          <li>Fichas de clientes, reseñas, promociones y estadísticas</li>
+        </ul>
+        <button class="btn btn-flow" data-go="e-inicio">Abrir el panel de la empresa</button>
+      </div>
+    </div>
+
+    <div class="sec" style="margin-top:20px">
+      <div class="sec-head"><div><h2>Recorrido guiado</h2><p class="muted" style="margin-top:6px">Seis pasos para ver cómo se conectan las dos partes. Cambia de vista con los botones de arriba.</p></div></div>
+      <div class="tourlist" id="tourList"></div>
+    </div>
+
+    <div class="sec" style="margin-top:20px">
+      <h2 style="margin-bottom:14px">Qué cambia respecto a la web actual</h2>
+      <div style="overflow-x:auto"><table class="vs">
+        <thead><tr><th></th><th>Ahora</th><th>Con la nueva app</th></tr></thead>
+        <tbody>
+          <tr><td>Presupuesto</td><td class="old">Llamar y esperar</td><td>En 1 minuto, con precio orientativo y fotos</td></tr>
+          <tr><td>Averías</td><td class="old">Teléfono</td><td>Aviso con marca, síntoma, urgencia y fotos</td></tr>
+          <tr><td>Citas</td><td class="old">Por teléfono</td><td>El cliente elige día y hora</td></tr>
+          <tr><td>Seguimiento</td><td class="old">No existe</td><td>El cliente ve el estado y quién va</td></tr>
+          <tr><td>Fidelización</td><td class="old">No existe</td><td>Recordatorios de revisión y planes anuales</td></tr>
+          <tr><td>Reseñas</td><td class="old">No existen</td><td>Reseñas verificadas de clientes reales</td></tr>
+          <tr><td>Dudas</td><td class="old">Horario de oficina</td><td>Asistente en la app a cualquier hora</td></tr>
+          <tr><td>Organización</td><td class="old">Papel y llamadas</td><td>Panel con agenda, partes y estadísticas</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="link" id="resetAll">Reiniciar la demo desde cero</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLIENTE: INICIO ================= -->
+<section class="view" id="v-inicio">
+  <div id="promoBox"></div>
+  <div class="hero">
+    <div>
+      <h1 data-i18n="hero_h1">El clima de tu casa o tu negocio, resuelto desde Cartes.</h1>
+      <p class="lead" data-i18n="hero_lead">Instalamos, reparamos y mantenemos aire acondicionado, bomba de calor y ventilación desde 1995. Pide presupuesto o avisa de una avería en menos de un minuto.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-flow" data-go="presupuesto" data-i18n="btn_presu">Pedir presupuesto</button>
+        <button class="btn btn-ghost" data-go="averia" data-i18n="btn_averia">Avisar de una avería</button>
+      </div>
+    </div>
+    <div class="stage" aria-label="Ilustración de una casa climatizada">
+      <svg class="house" viewBox="0 0 400 400" aria-hidden="true">
+        <circle cx="330" cy="70" r="34" fill="#fff" opacity=".7"/>
+        <path d="M40 330V170L200 70l160 100v160z" fill="#fff"/>
+        <path d="M24 178 200 62l176 116" stroke="#0F2A30" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="58" y="190" width="284" height="140" fill="#F6FAF9"/>
+        <path d="M58 260h284" stroke="#CFE0DE" stroke-width="3"/>
+        <rect x="100" y="204" width="130" height="34" rx="9" fill="#fff" stroke="#0F2A30" stroke-width="3"/>
+        <path d="M110 230h110" stroke="#CFE0DE" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="216" cy="214" r="3" fill="var(--flow)"/>
+        <path class="flowline" d="M115 248c10 18 30 18 40 0s30-18 40 0"/>
+        <path class="flowline" d="M125 268c10 18 30 18 40 0s30-18 40 0" style="animation-delay:-.8s;opacity:.7"/>
+        <path class="flowline" d="M135 288c10 18 30 18 40 0s30-18 40 0" style="animation-delay:-1.6s;opacity:.45"/>
+        <rect x="246" y="290" width="80" height="26" rx="8" fill="#1D4650"/>
+        <rect x="252" y="274" width="68" height="22" rx="7" fill="#2b5a66"/>
+        <path d="M80 316c-4-24 6-36 14-40-2 12 2 22-6 40" fill="#2E8B57"/>
+        <rect x="74" y="312" width="22" height="18" rx="4" fill="#EC963A"/>
+        <rect x="352" y="250" width="40" height="62" rx="6" fill="#fff" stroke="#0F2A30" stroke-width="3"/>
+        <circle cx="372" cy="281" r="13" fill="none" stroke="#0F2A30" stroke-width="3"/>
+        <path d="M372 268v26M359 281h26" stroke="#0F2A30" stroke-width="2"/>
+        <path d="M342 222h20v28" stroke="#0F2A30" stroke-width="3" fill="none"/>
+        <rect x="20" y="330" width="380" height="70" fill="#0F2A30" opacity=".08"/>
+      </svg>
+      <div class="dial" role="group" aria-label="Termostato de demostración">
+        <div class="seg"><button class="on" data-mode="cold">Frío</button><button data-mode="heat">Calor</button></div>
+        <div class="temp"><span id="tval">24</span><small>°C</small></div>
+        <div class="r"><button id="tdown" aria-label="Bajar temperatura">−</button><button id="tup" aria-label="Subir temperatura">+</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick">
+    <button class="qa urgent" data-go="averia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg><b data-i18n="qa1t">Tengo una avería</b><span data-i18n="qa1s">Cuéntanos qué pasa y envía una foto</span></button>
+    <button class="qa" data-go="presupuesto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><b data-i18n="qa2t">Presupuesto</b><span data-i18n="qa2s">Precio orientativo al momento</span></button>
+    <button class="qa" data-go="cita"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><b data-i18n="qa3t">Pedir cita</b><span data-i18n="qa3s">Elige día y hora de visita</span></button>
+    <button class="qa" data-go="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v3M11 14h.01"/></svg><b data-i18n="qa4t">¿Qué le pasa?</b><span data-i18n="qa4s">Guía de averías por síntoma</span></button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2 data-i18n="h_para">¿Para quién es?</h2></div>
+    <div class="paths">
+      <button class="path home" data-go="servicios" data-filter="particular">
+        <svg class="ill" viewBox="0 0 150 150" aria-hidden="true"><path d="M30 120V70l45-34 45 34v50z" fill="#fff"/><path d="M22 74 75 34l53 40" stroke="#0F2A30" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="62" y="88" width="26" height="32" rx="3" fill="#EC963A"/></svg>
+        <h3 style="font-size:1.5rem" data-i18n="p1">Particulares</h3>
+        <p class="small" data-i18n="p1s">Tu casa fresca en verano y caliente en invierno, con poco consumo.</p>
+        <ul><li>Splits</li><li>Conductos</li><li>Aerotermia</li><li>Mantenimiento</li></ul>
+      </button>
+      <button class="path biz" data-go="servicios" data-filter="empresa">
+        <svg class="ill" viewBox="0 0 150 150" aria-hidden="true"><rect x="34" y="40" width="80" height="84" rx="4" fill="#2b5a66"/><g fill="#2AA3B6"><rect x="46" y="54" width="14" height="12" rx="2"/><rect x="68" y="54" width="14" height="12" rx="2"/><rect x="90" y="54" width="14" height="12" rx="2"/><rect x="46" y="76" width="14" height="12" rx="2"/><rect x="68" y="76" width="14" height="12" rx="2"/><rect x="90" y="76" width="14" height="12" rx="2"/></g><rect x="62" y="100" width="24" height="24" fill="#EC963A"/></svg>
+        <h3 style="font-size:1.5rem" data-i18n="p2">Empresas y comunidades</h3>
+        <p class="small" style="color:#c6dade" data-i18n="p2s">Locales, naves, garajes y oficinas. Estudio técnico y contrato de mantenimiento.</p>
+        <ul><li>Garajes</li><li>Renovación de aire</li><li>Extracción</li><li>Grandes equipos</li></ul>
+      </button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2 data-i18n="h_hacemos">Lo que hacemos</h2><button class="link" data-go="servicios" data-i18n="ver_todos">Ver todos</button></div>
+    <div class="svc-grid" id="homeSvcs"></div>
+  </div>
+
+  <div class="sec">
+    <div class="panel" style="display:grid;gap:12px;background:var(--ink);color:#fff;border:0">
+      <h2 data-i18n="h_planes">Olvídate de las revisiones</h2>
+      <p style="color:#c6dade" data-i18n="h_planes_s">Con un plan de mantenimiento te avisamos, vamos y lo dejamos listo cada año. Prioridad si tienes una avería.</p>
+      <div><button class="btn btn-flow" data-go="planes" data-i18n="ver_planes">Ver planes</button></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2 data-i18n="h_marca">¿Qué marca es tu equipo?</h2></div>
+    <p class="muted" style="margin:-6px 0 14px" data-i18n="h_marca_s">Instalamos y reparamos las principales marcas. Toca la tuya para avisar de una avería.</p>
+    <div class="chips" id="brands"></div>
+  </div>
+
+  <div class="sec">
+    <div class="facts">
+      <div class="fact"><b>1995</b><span>Fundada en Torrelavega</span></div>
+      <div class="fact"><b id="years">30</b><span>Años instalando y reparando</span></div>
+      <div class="fact"><b>12</b><span>Marcas con las que trabajamos</span></div>
+      <div class="fact"><b>Cantabria</b><span>y otras provincias</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2 data-i18n="h_resenas">Lo que dicen los clientes</h2><button class="link" data-go="resenas" data-i18n="ver_todas">Ver todas</button></div>
+    <div id="homeRevs"></div>
+  </div>
+</section>
+
+<!-- ================= SERVICIOS ================= -->
+<section class="view" id="v-servicios">
+  <h1 data-i18n="nav_servicios">Servicios</h1>
+  <p class="muted intro" data-i18n="svc_s">Toca un servicio para ver qué incluye.</p>
+  <div class="filters" id="svcFilters">
+    <button class="chip on" data-f="todos">Todos</button>
+    <button class="chip" data-f="particular">Particulares</button>
+    <button class="chip" data-f="empresa">Empresas</button>
+  </div>
+  <div class="svc-grid" id="allSvcs"></div>
+</section>
+
+<!-- ================= PRESUPUESTO ================= -->
+<section class="view" id="v-presupuesto"><div class="narrow">
+  <h1>Pedir presupuesto</h1>
+  <div class="steps" id="qSteps"></div>
+  <div class="panel" id="qBody"></div>
+</div></section>
+
+<!-- ================= AVERÍA ================= -->
+<section class="view" id="v-averia"><div class="narrow">
+  <h1>Avisar de una avería</h1>
+  <p class="muted intro">Cuanta más información nos des, antes llegamos con la pieza correcta. ¿No sabes qué le pasa? <button class="link" data-go="guia">Mira la guía</button>.</p>
+  <form class="panel" id="avForm">
+    <label class="f">¿Qué equipo es?
+      <select name="equipo" required><option value="">Elige uno</option><option>Split de pared</option><option>Aire por conductos</option><option>Bomba de calor / aerotermia</option><option>Ventilación o extracción</option><option>Campana extractora</option><option>Otro</option></select>
+    </label>
+    <label class="f">Marca<select name="marca" id="avMarca"><option value="">No lo sé</option></select></label>
+    <label class="f">¿Qué le pasa?
+      <select name="sintoma" id="avSint" required><option value="">Elige el síntoma</option></select>
+    </label>
+    <label class="f">Código de error, si aparece<input type="text" name="codigo" placeholder="Por ejemplo: E5, U4, luz verde parpadea 3 veces"></label>
+    <label class="f">Más detalles (opcional)<textarea name="detalle"></textarea></label>
+    <div class="f">¿Cómo de urgente es?
+      <div class="urg" id="avUrg"><button type="button" data-u="Puede esperar">Puede esperar</button><button type="button" data-u="Esta semana" class="on">Esta semana</button><button type="button" data-u="Urgente">Urgente</button></div>
+    </div>
+    <label class="f">Fotos o vídeo del equipo (opcional)<input type="file" accept="image/*" multiple id="avFiles"><div class="thumbs" id="avThumbs"></div></label>
+    <label class="f">Nombre<input type="text" name="nombre" required autocomplete="name" class="yo-nombre"></label>
+    <label class="f">Teléfono<input type="tel" name="tel" required autocomplete="tel" class="yo-tel"></label>
+    <label class="f">Municipio<input type="text" name="lugar" placeholder="Torrelavega, Santander, Cartes…" class="yo-lugar"></label>
+    <button class="btn btn-main btn-block" type="submit">Enviar aviso</button>
+    <p class="small muted" style="margin-top:10px">¿Es muy urgente? <a href="tel:+34942890424">Llama al 942 890 424</a>.</p>
+  </form>
+</div></section>
+
+<!-- ================= GUÍA ================= -->
+<section class="view" id="v-guia"><div class="narrow">
+  <h1>¿Qué le pasa a tu equipo?</h1>
+  <p class="muted intro">Comprobaciones sencillas antes de llamar. Si no se arregla, avísanos desde aquí mismo.</p>
+  <div id="guiaList"></div>
+  <div class="panel" style="margin-top:14px"><h3>Si aparece un código de error</h3><p class="muted small" style="margin:6px 0 12px">Cada marca usa sus propios códigos. Anótalo junto con la marca y el modelo de la etiqueta del equipo, y mándanos una foto: así el técnico viene con la pieza adecuada.</p><button class="btn btn-main" data-go="averia">Avisar con el código</button></div>
+</div></section>
+
+<!-- ================= CITA ================= -->
+<section class="view" id="v-cita"><div class="narrow">
+  <h1>Pedir cita</h1>
+  <p class="muted intro">Elige un hueco para la visita técnica. Te confirmamos por teléfono.</p>
+  <div class="panel">
+    <label class="f">Motivo<select id="citaMotivo"><option>Revisión anual</option><option>Visita para presupuesto</option><option>Instalación ya acordada</option><option>Reparación</option></select></label>
+    <div class="f" style="margin-bottom:6px">Día</div>
+    <div class="days" id="days"></div>
+    <div class="slots" id="slots"></div>
+    <div style="margin-top:18px">
+      <label class="f">Nombre<input type="text" id="citaNombre" autocomplete="name" class="yo-nombre"></label>
+      <label class="f">Teléfono<input type="tel" id="citaTel" autocomplete="tel" class="yo-tel"></label>
+      <label class="f">Municipio<input type="text" id="citaLugar" class="yo-lugar"></label>
+    </div>
+    <button class="btn btn-main btn-block" id="citaOk" disabled>Reservar cita</button>
+  </div>
+</div></section>
+
+<!-- ================= CALCULADORA ================= -->
+<section class="view" id="v-calculadora"><div class="narrow">
+  <h1>¿Qué potencia necesito?</h1>
+  <p class="muted intro">Estimación rápida para una estancia. En la visita lo calculamos con precisión.</p>
+  <div class="panel">
+    <label class="f">Superficie de la estancia <span class="rangeval" id="cM2">20 m²</span><input type="range" id="cRange" min="6" max="120" value="20"></label>
+    <label class="f">Orientación<select id="cOri"><option value="1">Norte o poco sol</option><option value="1.1" selected>Este u oeste</option><option value="1.2">Sur, mucho sol</option></select></label>
+    <label class="f">Tipo de estancia<select id="cTipo"><option value="1">Dormitorio</option><option value="1.05" selected>Salón</option><option value="1.25">Cocina</option><option value="1.15">Oficina</option><option value="1.3">Local con público</option></select></label>
+    <label class="check"><input type="checkbox" id="cTop"> Último piso o bajo cubierta</label>
+    <div class="calc-out"><div><span class="small">Frigorías aprox.</span><b id="cF">—</b></div><div><span class="small">Potencia aprox.</span><b id="cK">—</b></div></div>
+    <p class="small muted" style="margin-top:12px" id="cTip"></p>
+    <button class="btn btn-flow btn-block" style="margin-top:14px" data-go="presupuesto">Pedir presupuesto</button>
+  </div>
+</div></section>
+
+<!-- ================= AHORRO ================= -->
+<section class="view" id="v-ahorro"><div class="narrow">
+  <h1>¿Cuánto ahorrarías con aerotermia?</h1>
+  <p class="muted intro">Compara tu calefacción actual con una bomba de calor. Es una estimación orientativa.</p>
+  <div class="panel">
+    <label class="f">Calefacción actual<select id="aSis"><option value=".6">Caldera de gasóleo</option><option value=".4">Caldera de gas natural</option><option value=".6">Gas propano</option><option value=".65">Radiadores o acumuladores eléctricos</option></select></label>
+    <label class="f">Gasto anual en calefacción y agua caliente <span class="rangeval" id="aGv">1.800 €</span><input type="range" id="aG" min="300" max="6000" step="100" value="1800"></label>
+    <div class="calc-out"><div><span class="small">Ahorro al año</span><b id="aY">—</b></div><div><span class="small">En 10 años</span><b id="aD">—</b></div></div>
+    <p class="small muted" style="margin-top:12px">Cálculo orientativo con porcentajes de ahorro habituales. El ahorro real depende del aislamiento, la instalación y las tarifas. Lo calculamos en la visita.</p>
+    <button class="btn btn-flow btn-block" style="margin-top:14px" id="aGo">Pedir presupuesto de aerotermia</button>
+  </div>
+</div></section>
+
+<!-- ================= PLANES ================= -->
+<section class="view" id="v-planes">
+  <h1>Planes de mantenimiento</h1>
+  <p class="muted intro">Una cuota al año y nos encargamos de todo. <span class="demo-tag">Precios de ejemplo</span></p>
+  <div class="plans" id="plans"></div>
+  <div class="sec" style="margin-top:24px"><h3>Por qué merece la pena</h3><ul style="margin-top:8px;padding-left:20px;color:var(--slate);display:grid;gap:4px"><li>Un equipo revisado consume menos y dura más años.</li><li>Las averías se detectan antes de que te dejen sin aire en pleno verano.</li><li>Mantienes la garantía del fabricante en regla.</li></ul></div>
+</section>
+
+<!-- ================= MIS COSAS ================= -->
+<section class="view" id="v-solicitudes">
+  <h1 data-i18n="nav_mis">Mis cosas</h1>
+  <div class="seg mine-seg" style="margin:16px 0 18px;max-width:440px"><button class="on" data-go="solicitudes">Solicitudes</button><button data-go="equipos">Equipos</button><button data-go="notifs">Avisos</button></div>
+  <div id="myReqs" style="display:grid;gap:12px"></div>
+</section>
+
+<section class="view" id="v-equipos">
+  <h1 data-i18n="nav_mis">Mis cosas</h1>
+  <div class="seg mine-seg" style="margin:16px 0 18px;max-width:440px"><button data-go="solicitudes">Solicitudes</button><button class="on" data-go="equipos">Equipos</button><button data-go="notifs">Avisos</button></div>
+  <p class="muted" style="margin-bottom:14px">Registra tus equipos: te avisamos de las revisiones y tienes a mano garantías y facturas.</p>
+  <div id="eqList" style="display:grid;gap:12px"></div>
+  <button class="btn btn-main" style="margin-top:16px" id="addEq">Añadir equipo</button>
+</section>
+
+<section class="view" id="v-notifs">
+  <h1 data-i18n="nav_mis">Mis cosas</h1>
+  <div class="seg mine-seg" style="margin:16px 0 18px;max-width:440px"><button data-go="solicitudes">Solicitudes</button><button data-go="equipos">Equipos</button><button class="on" data-go="notifs">Avisos</button></div>
+  <div id="notifList" style="display:grid;gap:10px"></div>
+</section>
+
+<!-- ================= OBRAS ================= -->
+<section class="view" id="v-obras">
+  <h1>Obras realizadas</h1>
+  <p class="muted intro">Trabajos de Air-Limp. Las fotos las sube la empresa desde su panel.</p>
+  <div class="compare" id="compare">
+    <svg viewBox="0 0 320 200" aria-hidden="true" id="beforeSvg"></svg>
+    <svg viewBox="0 0 320 200" aria-hidden="true" class="after" id="afterSvg"></svg>
+    <div class="bar"></div><span class="tagl">Antes</span><span class="tagr">Después</span>
+  </div>
+  <input type="range" min="0" max="100" value="50" id="cut" aria-label="Comparar antes y después" style="margin:10px 0 26px">
+  <div class="filters" id="workFilters"></div>
+  <div class="works" id="works"></div>
+</section>
+
+<!-- ================= RESEÑAS ================= -->
+<section class="view" id="v-resenas">
+  <h1 data-i18n="nav_resenas">Reseñas</h1>
+  <p class="muted intro">Solo de clientes reales. Air-Limp comprueba cada reseña antes de publicarla.</p>
+  <div id="revSummary"></div>
+  <div id="revList" class="reviews"></div>
+  <div class="sec" style="margin-top:28px">
+    <div class="narrow" style="margin:0">
+      <h2 style="margin-bottom:12px">Deja tu reseña</h2>
+      <form class="panel" id="revForm">
+        <div class="f">Tu valoración<div class="starpick" id="starPick"></div></div>
+        <label class="f">Servicio<select name="servicio" id="revSvc"></select></label>
+        <label class="f">Cuéntanos qué tal<textarea name="texto" required placeholder="¿Qué te pareció el trabajo, la puntualidad, el trato?"></textarea></label>
+        <label class="f">Nombre<input type="text" name="nombre" required class="yo-nombre"></label>
+        <label class="f">Municipio<input type="text" name="lugar" class="yo-lugar"></label>
+        <label class="check"><input type="checkbox" name="cliente" required> He sido cliente de Air-Limp. Entiendo que la empresa revisa la reseña antes de publicarla.</label>
+        <input type="hidden" name="reqId" id="revReq">
+        <button class="btn btn-main btn-block">Enviar reseña</button>
+      </form>
+      <a class="btn btn-ghost btn-block" style="margin-top:10px" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Air-Limp+Cartes+Cantabria">Valóranos también en Google</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= AYUDA ================= -->
+<section class="view" id="v-ayuda"><div class="narrow" style="margin:0;max-width:760px">
+  <h1>Preguntas frecuentes</h1>
+  <div style="margin-top:20px" id="faq"></div>
+  <div class="panel" style="margin-top:20px"><h3>¿No encuentras tu respuesta?</h3><p class="muted small" style="margin:6px 0 14px">Pregunta al asistente o llámanos.</p><div class="row"><button class="btn btn-main" data-chat>Preguntar al asistente</button><a class="btn btn-ghost" href="tel:+34942890424">Llamar</a></div></div>
+</div></section>
+
+<!-- ================= ZONAS ================= -->
+<section class="view" id="v-zonas"><div class="narrow" style="margin:0;max-width:760px">
+  <h1>Zonas donde trabajamos</h1>
+  <p class="muted intro">Estamos en Cartes, en el centro de Cantabria. Trabajamos en toda la comunidad y, para empresas, en otras provincias.</p>
+  <label class="f">¿Dónde está tu casa o tu negocio?<input type="text" id="zIn" list="zList" placeholder="Escribe tu municipio"><datalist id="zList"></datalist></label>
+  <div id="zOut"></div>
+  <div class="chips" id="zChips" style="margin-top:16px"></div>
+</div></section>
+
+<!-- ================= CONTACTO ================= -->
+<section class="view" id="v-contacto">
+  <h1 data-i18n="nav_contacto">Contacto</h1>
+  <div class="two-col" style="margin-top:20px">
+    <div class="panel" style="display:grid;gap:14px;align-content:start">
+      <div><span class="small muted">Dirección</span><p style="font-weight:600">Polígono Industrial Mies de Molladar, Nave E26<br>39311 Cartes, Cantabria</p></div>
+      <div><span class="small muted">Teléfono</span><p style="font-weight:600"><a href="tel:+34942890424">942 890 424</a> · Fax 942 801 580</p></div>
+      <div><span class="small muted">Horario</span><p style="font-weight:600">Lunes a viernes <span class="demo-tag">Pendiente de confirmar</span></p></div>
+      <div><span class="small muted">Email y WhatsApp</span><p style="font-weight:600"><span class="demo-tag">Pendiente de confirmar</span></p></div>
+      <div class="row">
+        <a class="btn btn-main" href="tel:+34942890424">Llamar</a>
+        <a class="btn btn-wa" id="waContact" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="btn btn-ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Pol%C3%ADgono+Industrial+Mies+de+Molladar+Nave+E26+Cartes+Cantabria">Cómo llegar</a>
+      </div>
+      <button class="link" data-go="zonas" style="justify-self:start">Ver zonas donde trabajamos</button>
+    </div>
+    <div class="map-card">
+      <svg viewBox="0 0 400 300" style="width:100%;height:100%" aria-hidden="true">
+        <rect width="400" height="300" fill="#E4F1F0"/>
+        <path d="M0 210c60-20 120 10 180-10s140-40 220-20v120H0z" fill="#D3EEF1"/>
+        <path d="M-10 120 410 80M60 -10l60 320M250 -10l-30 320M0 250l400-60" stroke="#fff" stroke-width="14"/>
+        <text x="300" y="70" font-family="Figtree" font-size="13" fill="#5A7378">A-67</text>
+        <text x="20" y="40" font-family="Figtree" font-size="13" fill="#5A7378">Torrelavega</text>
+        <circle cx="200" cy="150" r="26" fill="#0F2A30" opacity=".12"/>
+        <path d="M200 112c-14 0-24 10-24 24 0 18 24 40 24 40s24-22 24-40c0-14-10-24-24-24z" fill="#0F2A30"/>
+        <circle cx="200" cy="136" r="8" fill="#2AA3B6"/>
+        <text x="200" y="198" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="700" font-size="15" fill="#0F2A30">Air-Limp · Cartes</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EMPRESA: LOGIN ================= -->
+<section class="view" id="v-e-login"><div class="narrow" style="max-width:420px">
+  <div class="panel" style="display:grid;gap:14px;margin-top:20px">
+    <h2>Acceso empresa</h2>
+    <p class="muted small">Solo para el personal de Air-Limp. Cada técnico tendría su propio usuario.</p>
+    <label class="f" style="margin:0">Usuario<input type="text" id="lgUser" value="oficina" autocomplete="username"></label>
+    <label class="f" style="margin:0">Contraseña<input type="password" id="lgPass" placeholder="••••" autocomplete="current-password"></label>
+    <button class="btn btn-main" id="lgOk">Entrar</button>
+    <p class="small"><span class="demo-tag">Demo</span> Contraseña: <b>1995</b></p>
+  </div>
+</div></section>
+
+<!-- ================= EMPRESA: RESUMEN ================= -->
+<section class="view" id="v-e-inicio">
+  <div class="sec-head"><div><h1>Buenos días</h1><p class="muted" id="eDate" style="margin-top:6px"></p></div><button class="btn btn-sm btn-ghost" id="logout">Cerrar sesión</button></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="dash">
+    <div class="card"><div class="card-top"><h3>Hoy</h3><button class="link small" data-go="e-agenda">Agenda</button></div><div id="eToday" style="display:grid;gap:8px"></div></div>
+    <div class="card"><div class="card-top"><h3>Solicitudes por mes</h3><span class="demo-tag">Histórico de ejemplo</span></div><div class="cols" id="eMonths"></div></div>
+    <div class="card"><h3>Servicios más pedidos</h3><div class="bars" id="eSvcs"></div><h3 style="margin-top:6px">Zonas</h3><div class="bars" id="eZones"></div></div>
+  </div>
+</section>
+
+<!-- ================= EMPRESA: SOLICITUDES ================= -->
+<section class="view" id="v-e-solicitudes">
+  <h1>Solicitudes</h1>
+  <div class="filters" style="margin-top:16px" id="reqEst"></div>
+  <div class="filters" id="reqTipo"></div>
+  <div id="reqs"></div>
+</section>
+
+<!-- ================= EMPRESA: AGENDA ================= -->
+<section class="view" id="v-e-agenda">
+  <div class="sec-head"><h1>Agenda</h1><input type="date" id="agDay" style="width:auto"></div>
+  <div class="lanes" id="lanes"></div>
+</section>
+
+<!-- ================= EMPRESA: CLIENTES ================= -->
+<section class="view" id="v-e-clientes">
+  <h1>Clientes</h1>
+  <input type="text" id="cliQ" placeholder="Buscar por nombre, teléfono o municipio" style="margin:16px 0">
+  <div id="cliList" style="display:grid;gap:10px"></div>
+</section>
+
+<!-- ================= EMPRESA: RESEÑAS ================= -->
+<section class="view" id="v-e-resenas">
+  <h1>Reseñas</h1>
+  <p class="muted intro">Revisa cada reseña antes de publicarla y contesta a los clientes. Las verificadas vienen de un trabajo terminado.</p>
+  <div class="filters" id="erFilters"></div>
+  <div id="erList" style="display:grid;gap:10px"></div>
+</section>
+
+<!-- ================= EMPRESA: CONTENIDO ================= -->
+<section class="view" id="v-e-contenido">
+  <h1>Contenido de la app</h1>
+  <div class="two-col" style="margin-top:18px;align-items:start">
+    <div class="panel">
+      <h3>Promoción en portada</h3>
+      <p class="muted small" style="margin:4px 0 14px">Lo que ven los clientes arriba del todo al abrir la app.</p>
+      <label class="check"><input type="checkbox" id="pOn"> Mostrar promoción</label>
+      <label class="f">Título<input type="text" id="pT"></label>
+      <label class="f">Texto<textarea id="pX"></textarea></label>
+      <button class="btn btn-main" id="pSave">Guardar promoción</button>
+    </div>
+    <div class="panel">
+      <h3>Subir foto de una obra</h3>
+      <p class="muted small" style="margin:4px 0 14px">Aparece al momento en "Obras realizadas".</p>
+      <label class="f">Foto<input type="file" accept="image/*" id="oF"></label>
+      <label class="f">Título<input type="text" id="oT" placeholder="Por ejemplo: aerotermia en vivienda"></label>
+      <div class="row"><label class="f grow">Tipo<select id="oK"><option value="hogar">Viviendas</option><option value="local">Locales</option><option value="garaje">Garajes</option><option value="industria">Industria</option></select></label><label class="f grow">Municipio<input type="text" id="oL"></label></div>
+      <button class="btn btn-main" id="oSave">Publicar obra</button>
+      <div id="oList" style="display:grid;gap:8px;margin-top:14px"></div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:24px"><h2 style="margin-bottom:12px">Contratos de mantenimiento</h2><div id="ctList" style="display:grid;gap:10px"></div></div>
+</section>
+
+<footer>
+  <img class="logo" src="https://airlimp.com/img/logo.png" alt="Air-Limp" onerror="this.remove()">
+  <p>Air-Limp Climatización · Polígono Mies de Molladar, Nave E26, Cartes (Cantabria) · 942 890 424</p>
+  <p style="margin-top:6px">Propuesta de nueva web y app · Diseño: Maykel Puente</p>
+</footer>
+</main>
+
+<!-- Tabs cliente -->
+<nav class="tabs c" aria-label="Navegación cliente">
+  <button data-go="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9H3z"/></svg><span data-i18n="tab_inicio">Inicio</span></button>
+  <button data-go="servicios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="8" rx="2"/><path d="M7 18c1 1.5 2 1.5 3 0s2-1.5 3 0 2 1.5 3 0" stroke-linecap="round"/></svg><span data-i18n="tab_servicios">Servicios</span></button>
+  <button data-go="pedir" class="plus" aria-label="Pedir"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i><span data-i18n="tab_pedir">Pedir</span></button>
+  <button data-go="solicitudes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 12 3 3 5-6"/></svg><span data-i18n="tab_mis">Mis cosas</span><span class="badge" id="tabBell"></span></button>
+  <button data-go="menu-c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span data-i18n="tab_mas">Más</span></button>
+</nav>
+<!-- Tabs empresa -->
+<nav class="tabs e" aria-label="Navegación empresa">
+  <button data-go="e-inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Resumen</button>
+  <button data-go="e-solicitudes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Solicitudes<span class="badge" id="etabBell"></span></button>
+  <button data-go="e-agenda" class="plus" aria-label="Agenda"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></i>Agenda</button>
+  <button data-go="e-resenas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Reseñas</button>
+  <button data-go="menu-e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Más</button>
+</nav>
+
+<!-- Botones flotantes cliente -->
+<div class="fab">
+  <a class="wa" id="waFab" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.7 2.7 0 0 0 1.7-1.2c.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3z"/></svg></a>
+  <button class="chatb" data-chat aria-label="Abrir asistente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" stroke-width="3"/></svg></button>
+</div>
+
+<!-- Chat -->
+<div class="chat" id="chat" role="dialog" aria-label="Asistente Air-Limp">
+  <div class="chat-h">
+    <div class="av"><svg viewBox="0 0 48 48"><rect x="6" y="14" width="36" height="14" rx="4" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><circle cx="18" cy="21" r="2.5" fill="#0F2A30"/><circle cx="30" cy="21" r="2.5" fill="#0F2A30"/><path d="M14 33c3 5 7 5 10 0s7-5 10 0" stroke="#2AA3B6" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="grow"><b>Asistente Air-Limp</b><div class="small muted">Responde al momento · te pasa con un técnico si hace falta</div></div>
+    <button class="iconbtn" id="chatClose" aria-label="Cerrar asistente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="chat-log" id="chatLog" aria-live="polite"></div>
+  <div class="chat-sug" id="chatSug"></div>
+  <form class="chat-in" id="chatForm"><input type="text" id="chatIn" placeholder="Escribe tu duda…" autocomplete="off"><button aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div id="printArea"></div>
+
+<script>
+/* =========================================================
+   DATOS
+   ========================================================= */
+const MODE=window.APP_MODE||'demo', CANPRINT=window.APP_TARGET!=='artifact';
+if(MODE!=='demo')document.body.classList.add('solo');
+const PHONE='942890424', WHATSAPP='34942890424'; // WhatsApp pendiente de confirmar con la empresa
+const TECNICOS=['Técnico 1','Técnico 2','Técnico 3'];
+const EST=['Recibida','Asignada','En camino','Terminada'];
+const BRANDS=['Daikin','Mitsubishi Electric','Mitsubishi Heavy Industries','Carrier','Hitecsa','Fujitsu','Kosner','Soler & Palau','Casals','Sodeca','Negarra','Metu'];
+const ZONAS=['Cartes','Torrelavega','Santander','Reocín','Polanco','Suances','Santillana del Mar','Piélagos','Camargo','Los Corrales de Buelna','Puente Viesgo','Cabezón de la Sal','Comillas','San Vicente de la Barquera','Castro Urdiales','Laredo','Santoña','Reinosa','Astillero','Miengo','Mazcuerras','San Felices de Buelna','Molledo','Cayón'];
+const ICON={
+ split:`<svg viewBox="0 0 48 48"><rect x="4" y="10" width="40" height="14" rx="4" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M9 20h30" stroke="#CFE0DE" stroke-width="2"/><path d="M12 30c3 5 7 5 10 0s7-5 10 0M16 37c3 5 7 5 10 0" stroke="#2AA3B6" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+ conductos:`<svg viewBox="0 0 48 48"><path d="M4 12h40" stroke="#0F2A30" stroke-width="2.5"/><rect x="8" y="16" width="32" height="8" rx="2" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M17 19v2M22 19v2M27 19v2M32 19v2" stroke="#0F2A30" stroke-width="2"/><path d="M14 30v8M24 30v10M34 30v8" stroke="#2AA3B6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3"/></svg>`,
+ bomba:`<svg viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="32" rx="4" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><circle cx="21" cy="24" r="10" fill="none" stroke="#0F2A30" stroke-width="2.5"/><path d="M21 14c4 4 4 6 0 10s-4 6 0 10M11 24c4-4 6-4 10 0s6 4 10 0" stroke="#EC963A" stroke-width="2" fill="none"/><path d="M36 14v20" stroke="#CFE0DE" stroke-width="2"/></svg>`,
+ ventilacion:`<svg viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="6" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><circle cx="24" cy="24" r="4" fill="#0F2A30"/><g fill="#2AA3B6"><path d="M24 20c-2-8 2-12 6-10s-2 8-6 10z"/><path d="M28 24c8-2 12 2 10 6s-8-2-10-6z"/><path d="M24 28c2 8-2 12-6 10s2-8 6-10z"/><path d="M20 24c-8 2-12-2-10-6s8 2 10 6z"/></g></svg>`,
+ campana:`<svg viewBox="0 0 48 48"><rect x="19" y="4" width="10" height="14" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M8 30 19 18h10l11 12z" fill="#fff" stroke="#0F2A30" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 30h32" stroke="#0F2A30" stroke-width="3"/><path d="M18 42c-2-3 2-4 0-7M24 42c-2-3 2-4 0-7M30 42c-2-3 2-4 0-7" stroke="#EC963A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+ chimenea:`<svg viewBox="0 0 48 48"><rect x="16" y="8" width="16" height="8" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M14 16h20v26H14z" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M18 21h12M18 26h12M18 31h12M18 36h12" stroke="#CFE0DE" stroke-width="2"/><path d="M22 7c-2-2 2-3 0-5M27 7c-2-2 2-3 0-5" stroke="#5A7378" stroke-width="2" fill="none"/></svg>`,
+ mantenimiento:`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M28.7 15.3a6 6 0 0 0-8 8L13 31l4 4 7.7-7.7a6 6 0 0 0 8-8l-3.5 3.5-3.2-.8-.8-3.2z" fill="#2E8B57"/></svg>`
+};
+const SERVICES=[
+ {id:'split',name:'Aire acondicionado split',en:'Split air conditioning',desc:'Equipos de pared para una o varias estancias, con frío y calor.',desc_en:'Wall units for one or more rooms, with cooling and heating.',for:['particular','empresa'],inc:['Estudio de la estancia y potencia','Suministro del equipo de la marca que elijas','Instalación, vacío y puesta en marcha','Retirada del equipo antiguo']},
+ {id:'conductos',name:'Climatización por conductos',en:'Ducted air conditioning',desc:'Una sola máquina oculta en el falso techo que climatiza toda la vivienda o el local.',desc_en:'One unit hidden in the ceiling that heats and cools the whole home or premises.',for:['particular','empresa'],inc:['Diseño de la red de conductos y rejillas','Control por zonas y termostato wifi','Instalación completa y pruebas']},
+ {id:'bomba',name:'Bomba de calor y aerotermia',en:'Heat pumps and aerothermal',desc:'Calefacción y agua caliente con bajo consumo, compatible con suelo radiante y radiadores.',desc_en:'Low-consumption heating and hot water, works with underfloor heating and radiators.',for:['particular','empresa'],inc:['Estudio de ahorro frente a gas o gasóleo','Instalación y conexión al circuito existente','Asesoramiento sobre ayudas disponibles']},
+ {id:'ventilacion',name:'Ventilación y renovación de aire',en:'Ventilation and air renewal',desc:'Sistemas para garajes, locales comerciales y oficinas conforme a normativa.',desc_en:'Systems for garages, shops and offices that meet regulations.',for:['empresa'],inc:['Estudio técnico y cálculo de caudales','Detección de CO en garajes','Instalación y certificado']},
+ {id:'campana',name:'Campanas extractoras',en:'Extractor hoods',desc:'Extracción para cocinas de hostelería y particulares, a medida.',desc_en:'Custom extraction for restaurant and home kitchens.',for:['particular','empresa'],inc:['Fabricación a medida','Motor y conducto de salida','Limpieza y mantenimiento periódico']},
+ {id:'chimenea',name:'Chimeneas modulares',en:'Modular chimneys',desc:'Salidas de humos seguras para calderas, estufas y cocinas.',desc_en:'Safe flue outlets for boilers, stoves and kitchens.',for:['particular','empresa'],inc:['Tubería modular homologada','Montaje en fachada o cubierta','Revisión de tiro']},
+ {id:'mantenimiento',name:'Mantenimiento y reparación',en:'Maintenance and repair',desc:'Revisión anual, limpieza, recarga de gas y reparación de cualquier marca.',desc_en:'Annual service, cleaning, gas recharge and repair of any brand.',for:['particular','empresa'],inc:['Limpieza de filtros y baterías','Comprobación de gas y presiones','Contrato anual para empresas y comunidades']}
+];
+const FAQ=[
+ ['¿Cada cuánto hay que revisar el aire acondicionado?','Una revisión al año, mejor antes del verano. Los filtros conviene limpiarlos cada dos o tres meses si el equipo se usa a diario.','How often should the AC be serviced?','Once a year, ideally before summer. Clean the filters every two or three months if you use it daily.'],
+ ['¿Bomba de calor o aire acondicionado?','Un split moderno ya es bomba de calor: da frío y calor. Si quieres sustituir la caldera y tener agua caliente, lo que necesitas es aerotermia.','Heat pump or air conditioning?','A modern split is already a heat pump: it cools and heats. To replace your boiler and get hot water, you need an aerothermal system.'],
+ ['¿Cuánto consume un equipo?','Depende de la potencia y la clase energética. Un split de clase alta bien dimensionado consume poco en uso normal. Te lo calculamos para tu caso.','How much does a unit consume?','It depends on power and energy class. A well-sized high-efficiency split uses little in normal use. We calculate it for you.'],
+ ['¿Hay ayudas para la aerotermia?','Suele haber programas de ayudas para mejorar la eficiencia energética. Cambian cada año, así que te informamos de las que estén abiertas al hacer el presupuesto.','Are there grants for aerothermal?','There are usually energy-efficiency grant programmes. They change every year, so we tell you which are open when we quote.'],
+ ['Mi equipo gotea agua, ¿es grave?','Normalmente es el desagüe atascado o el filtro sucio. Apágalo, pon algo debajo y avísanos con una foto.','My unit is dripping water, is it serious?','Usually a blocked drain or dirty filter. Switch it off, put something underneath and send us a photo.'],
+ ['¿Qué garantía tiene la instalación?','La del fabricante del equipo más la de nuestra instalación. Te la detallamos por escrito en el presupuesto.','What warranty does the installation have?','The manufacturer’s warranty plus our installation warranty, detailed in writing in the quote.'],
+ ['¿Se puede pagar a plazos?','Sí, en el presupuesto puedes ver una cuota orientativa a 12, 24 o 36 meses. La financiación está sujeta a aprobación.','Can I pay in instalments?','Yes, the quote shows an estimated monthly payment over 12, 24 or 36 months, subject to approval.'],
+ ['¿Trabajáis fuera de Cantabria?','Sí, sobre todo para empresas. Cuéntanos tu proyecto.','Do you work outside Cantabria?','Yes, mainly for businesses. Tell us about your project.']
+];
+const GUIA=[
+ {s:'No enciende',u:'Media',c:['Comprueba que el mando tiene pilas y que el modo es el correcto.','Mira si ha saltado el diferencial o el automático del aire en el cuadro eléctrico.','Si salta otra vez al subirlo, no insistas: déjalo bajado y avísanos.']},
+ {s:'Enciende pero no enfría',u:'Media',c:['Revisa que la temperatura del mando esté por debajo de la de la habitación y en modo frío.','Limpia los filtros de la unidad interior: si están sucios, apenas sale aire.','Cierra puertas y ventanas. Si sigue igual, puede faltar gas y hace falta un técnico.']},
+ {s:'Enciende pero no calienta',u:'Media',c:['Comprueba que está en modo calor.','En días muy fríos la unidad exterior hace pausas de desescarche de unos minutos: es normal.','Si no calienta en ningún momento, avísanos.']},
+ {s:'Gotea agua',u:'Esta semana',c:['Apaga el equipo y pon un recipiente debajo.','Suele ser el desagüe atascado o los filtros muy sucios.','Mándanos una foto de dónde cae el agua.']},
+ {s:'Hace ruido',u:'Esta semana',c:['Mira si hay algo tocando la unidad exterior o si está mal apoyada.','Un zumbido suave es normal; golpes o ruidos metálicos no.','Si el ruido es fuerte, apágalo y avísanos.']},
+ {s:'Huele mal',u:'Esta semana',c:['Olor a humedad: filtros y batería sucios. Necesita limpieza.','Olor a quemado: apágalo, desenchúfalo del cuadro y avísanos como urgente.']},
+ {s:'Sale hielo en los tubos o el equipo',u:'Esta semana',c:['Suele deberse a filtros muy sucios o a falta de gas.','Apágalo para que se descongele y avísanos.']},
+ {s:'Muestra un código de error',u:'Media',c:['Anota el código exacto o cuántas veces parpadea la luz.','Haz una foto de la etiqueta con la marca y el modelo.','Envíanoslo: el técnico vendrá con la pieza adecuada.']},
+ {s:'Otro',u:'Media',c:['Cuéntanos qué notas y, si puedes, envía una foto o un vídeo.']}
+];
+const WORKS=[{t:'Climatización de vivienda unifamiliar',k:'hogar',l:'Torrelavega'},{t:'Ventilación de garaje comunitario',k:'garaje',l:'Santander'},{t:'Campana para cocina de restaurante',k:'local',l:'Cartes'},{t:'Aerotermia con suelo radiante',k:'hogar',l:'Reocín'},{t:'Renovación de aire en nave',k:'industria',l:'Polanco'},{t:'Conductos en oficinas',k:'local',l:'Santander'}];
+const WORK_LABEL={hogar:'Viviendas',local:'Locales',garaje:'Garajes',industria:'Industria'};
+const PLANS=[
+ {id:'basico',n:'Básico',p:79,per:'/año',d:'Para un equipo',inc:['1 revisión anual completa','Limpieza de filtros y unidad interior','Recordatorio en la app']},
+ {id:'hogar',n:'Hogar',p:129,per:'/año',d:'Hasta 3 equipos',inc:['1 revisión anual por equipo','Prioridad en averías','Sin coste de desplazamiento','10 % en reparaciones'],star:true},
+ {id:'empresa',n:'Empresa',p:null,per:'',d:'Locales, naves y comunidades',inc:['Revisiones según normativa','Atención prioritaria','Informe de cada visita','Precio según instalación']}
+];
+const EN={nav_inicio:'Home',nav_servicios:'Services',nav_planes:'Plans',nav_obras:'Projects',nav_resenas:'Reviews',nav_mis:'My stuff',nav_contacto:'Contact',tab_inicio:'Home',tab_servicios:'Services',tab_pedir:'Request',tab_mis:'My stuff',tab_mas:'More',
+ hero_h1:'Your home or business climate, sorted from Cartes.',hero_lead:'We install, repair and service air conditioning, heat pumps and ventilation since 1995. Get a quote or report a fault in under a minute.',btn_presu:'Get a quote',btn_averia:'Report a fault',
+ qa1t:'I have a fault',qa1s:'Tell us what happens and send a photo',qa2t:'Quote',qa2s:'Estimated price instantly',qa3t:'Book a visit',qa3s:'Pick a day and time',qa4t:'What’s wrong?',qa4s:'Fault guide by symptom',
+ h_para:'Who is it for?',p1:'Homes',p1s:'Cool in summer, warm in winter, with low consumption.',p2:'Businesses and communities',p2s:'Shops, warehouses, garages and offices. Technical study and maintenance contract.',
+ h_hacemos:'What we do',ver_todos:'See all',ver_todas:'See all',h_planes:'Forget about servicing',h_planes_s:'With a maintenance plan we remind you, come over and get it ready every year. Priority if something breaks.',ver_planes:'See plans',
+ h_marca:'What brand is your unit?',h_marca_s:'We install and repair the main brands. Tap yours to report a fault.',h_resenas:'What our clients say',svc_s:'Tap a service to see what it includes.'};
+
+/* =========================================================
+   ESTADO (compartido entre cliente y empresa)
+   ========================================================= */
+const KEY='airlimp-demo-v3';
+const ymd=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function seed(){const d=Date.now(),t=ymd();return{
+ lang:'es',yo:{nombre:'',tel:'',lugar:''},flags:{},
+ promo:{on:true,t:'Revisión de invierno: 20 % de descuento',x:'Pon a punto tu bomba de calor antes del frío. Pide cita desde la app hasta el 15 de diciembre.'},
+ reqs:[
+  {id:1,demo:true,tipo:'averia',titulo:'Split de pared · no enfría',quien:'Lucía G.',tel:'600 000 001',lugar:'Torrelavega',extra:'Mitsubishi Electric · Urgente',fecha:d-3600e3,estado:'Recibida',tecnico:'',dia:t,hora:''},
+  {id:2,demo:true,tipo:'presupuesto',titulo:'Bomba de calor o aerotermia · 110 m²',quien:'Comunidad Av. España',tel:'600 000 002',lugar:'Santander',extra:'Orientativo 8.700 € – 13.800 €',fecha:d-86400e3,estado:'Asignada',tecnico:'Técnico 2',dia:t,hora:'12:00',presu:{servicio:'bomba',m2:110,n:4,a:8700,b:13800}},
+  {id:3,demo:true,tipo:'cita',titulo:'Revisión anual',quien:'Pedro R.',tel:'600 000 003',lugar:'Cartes',extra:'',fecha:d-2*86400e3,estado:'En camino',tecnico:'Técnico 1',dia:t,hora:'10:00'},
+  {id:4,demo:true,tipo:'averia',titulo:'Campana extractora · no extrae',quien:'Restaurante El Puerto',tel:'600 000 004',lugar:'Polanco',extra:'Casals · Esta semana',fecha:d-5*3600e3,estado:'Asignada',tecnico:'Técnico 3',dia:t,hora:'16:30'},
+  {id:5,demo:true,tipo:'revision',titulo:'Revisión · Aire por conductos',quien:'Bar La Plaza',tel:'600 000 005',lugar:'Suances',extra:'',fecha:d-3*86400e3,estado:'Terminada',tecnico:'Técnico 1',dia:t,hora:'09:00'}
+ ],
+ equipos:[],reviews:[],notifs:[],obras:[],contratos:[]}}
+let S;
+function load(){try{S=JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){S=seed()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){if(e&&e.name==='QuotaExceededError')toast('La demo no puede guardar tantas fotos. Borra alguna.')}checkTour();badges()}
+load();
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=n=>new Intl.NumberFormat('es-ES').format(Math.round(n/50)*50)+' €';
+const eur2=n=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' €';
+const fmt=d=>new Date(d).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+const fmtDay=s=>{if(!s)return'';const [y,m,dd]=s.split('-');return new Date(+y,+m-1,+dd).toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})};
+const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return'hace '+Math.round(h/24)+' d'};
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+const wa=(num,txt)=>'https://wa.me/'+num.replace(/\D/g,'').replace(/^(?!34)(\d{9})$/,'34$1')+(txt?'?text='+encodeURIComponent(txt):'');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3000)}
+function compress(file,max=900){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.7))};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
+async function readImgs(input){const out=[];for(const f of [...input.files].slice(0,4)){if(!f.type.startsWith('image'))continue;const u=await compress(f);if(u)out.push(u)}return out}
+const mine=()=>S.reqs.filter(r=>r.mine);
+function notify(texto,go){S.notifs.unshift({id:Date.now()+Math.random(),texto,go,fecha:Date.now(),leida:false})}
+function saveYo(n,t,l){if(n)S.yo.nombre=n;if(t)S.yo.tel=t;if(l)S.yo.lugar=l}
+function fillYo(){$$('.yo-nombre').forEach(i=>{if(!i.value)i.value=S.yo.nombre});$$('.yo-tel').forEach(i=>{if(!i.value)i.value=S.yo.tel});$$('.yo-lugar').forEach(i=>{if(!i.value)i.value=S.yo.lugar})}
+function addReq(r){S.reqs.unshift(Object.assign({id:Date.now(),fecha:Date.now(),estado:'Recibida',tecnico:'',dia:'',hora:'',mine:true,fotos:[]},r));save()}
+
+/* =========================================================
+   HOJA INFERIOR (deslizar hacia abajo para cerrar)
+   ========================================================= */
+function openSheet(html){const sh=$('#sheet');$('#sheetBody').innerHTML=html;sh.style.transform='';sh.scrollTop=0;sh.classList.add('on');$('#scrim').classList.add('on')}
+function closeSheet(){const sh=$('#sheet');sh.classList.remove('on','drag');sh.style.transform='';$('#scrim').style.opacity='';$('#scrim').classList.remove('on')}
+$('#scrim').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();closeChat()}});
+(()=>{const sh=$('#sheet'),sc=$('#scrim');let y0=null,dy=0,t0=0,dragging=false;
+  sh.addEventListener('touchstart',e=>{if(innerWidth>=760||!sh.classList.contains('on'))return;
+    if(e.target.closest('canvas,input[type=range],textarea,select')){y0=null;return}
+    if(sh.scrollTop>0&&!e.target.closest('.grab')){y0=null;return}
+    y0=e.touches[0].clientY;dy=0;t0=Date.now();dragging=false},{passive:true});
+  sh.addEventListener('touchmove',e=>{if(y0===null)return;dy=e.touches[0].clientY-y0;
+    if(dy<=0){if(dragging)sh.style.transform='translateY(0)';return}
+    dragging=true;sh.classList.add('drag');if(e.cancelable)e.preventDefault();
+    sh.style.transform=`translateY(${dy}px)`;sc.style.opacity=Math.max(0,1-dy/sh.offsetHeight)},{passive:false});
+  sh.addEventListener('touchend',()=>{if(y0===null)return;y0=null;sh.classList.remove('drag');if(!dragging)return;dragging=false;
+    const fast=dy/(Date.now()-t0)>0.5;if(dy>sh.offsetHeight*0.25||(fast&&dy>40))closeSheet();else{sh.style.transform='';sc.style.opacity=''}});
+})();
+
+/* =========================================================
+   NAVEGACIÓN
+   ========================================================= */
+let logged=false,afterLogin='e-inicio',current='portada';
+const R={};
+function go(v,opt={}){
+  if(v==='menu-c')return menuC();
+  if(v==='menu-e')return menuE();
+  if(v==='pedir')return openPedir();
+  closeSheet();closeChat();
+  if(MODE==='cliente'&&(v==='portada'||v.startsWith('e-')))v='inicio';
+  if(MODE==='empresa'&&!v.startsWith('e-'))v='e-inicio';
+  if(v.startsWith('e-')&&v!=='e-login'&&!logged){afterLogin=v;v='e-login'}
+  if(!$('#v-'+v))v='portada';
+  const role=v==='portada'?'portada':v.startsWith('e-')?'empresa':'cliente';
+  document.body.dataset.role=role;current=v;
+  $$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  $$('.tabs button[data-go], .top nav button[data-go]').forEach(b=>{const g=b.dataset.go;b.classList.toggle('on',g===v||(g==='solicitudes'&&['equipos','notifs'].includes(v)))});
+  $$('[data-role-go]').forEach(b=>b.classList.toggle('on',b.dataset.roleGo===role));
+  if(R[v])R[v](opt);
+  fillYo();
+  window.scrollTo({top:0});
+  try{history.replaceState(null,'','#'+v)}catch(e){}
+  badges();
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-chat]');if(c){e.preventDefault();openChat();return}
+  const r=e.target.closest('[data-role-go]');if(r){const k=r.dataset.roleGo;go(k==='cliente'?'inicio':k==='empresa'?'e-inicio':'portada');return}
+  const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go,{filter:b.dataset.filter,arg:b.dataset.arg})}
+});
+function menuC(){const it=[['obras','Obras realizadas'],['resenas','Reseñas'],['planes','Planes de mantenimiento'],['guia','Guía de averías'],['cita','Pedir cita'],['calculadora','Calculadora de potencia'],['ahorro','Calculadora de ahorro'],['zonas','Zonas donde trabajamos'],['ayuda','Preguntas frecuentes'],['contacto','Contacto y cómo llegar']];
+  openSheet(`<h2 style="margin-bottom:14px">Más</h2><div class="menu-list"><button data-chat>Preguntar al asistente <span class="pill dark">24 h</span></button>${it.map(([k,n])=>`<button data-go="${k}">${n}</button>`).join('')}<button id="langMenu">${S.lang==='es'?'English version':'Versión en español'}</button></div>`);
+  $('#langMenu').onclick=()=>{toggleLang();closeSheet()}}
+function menuE(){openSheet(`<h2 style="margin-bottom:14px">Más</h2><div class="menu-list"><button data-go="e-clientes">Clientes</button><button data-go="e-contenido">Contenido, obras y promociones</button><button data-go="e-contenido">Contratos de mantenimiento <span class="pill">${S.contratos.length}</span></button>${MODE==='demo'?'<button data-go="inicio">Ver la app como cliente</button>':''}<button id="lo2">Cerrar sesión</button></div>`);$('#lo2').onclick=()=>{logged=false;go('portada')}}
+function openPedir(){openSheet(`<h2 style="margin-bottom:14px">¿Qué necesitas?</h2><div class="opts">
+  <button class="opt" data-go="averia">${ICON.mantenimiento}<div><b>Avisar de una avería</b><small>Algo no funciona</small></div></button>
+  <button class="opt" data-go="presupuesto">${ICON.split}<div><b>Pedir presupuesto</b><small>Instalación nueva o cambio de equipo</small></div></button>
+  <button class="opt" data-go="cita">${ICON.conductos}<div><b>Pedir cita</b><small>Revisión o visita técnica</small></div></button>
+  <button class="opt" data-go="planes">${ICON.bomba}<div><b>Contratar mantenimiento</b><small>Revisiones todos los años</small></div></button></div>`)}
+
+function badges(){
+  const n=S.notifs.filter(x=>!x.leida).length;['#bell','#tabBell'].forEach(s=>$(s).textContent=n||'');
+  const e=S.reqs.filter(r=>r.estado==='Recibida').length+S.reviews.filter(r=>r.estado==='pendiente').length;['#ebell','#etabBell'].forEach(s=>$(s).textContent=e||'');
+}
+
+/* =========================================================
+   RECORRIDO GUIADO
+   ========================================================= */
+const TOUR=[
+ {who:'c',t:'Avisa de una avería',d:'Como cliente: rellena el aviso, con una foto si quieres.',go:'averia',ok:()=>mine().some(r=>r.tipo==='averia')},
+ {who:'e',t:'Asigna un técnico y ponlo "En camino"',d:'Como empresa: en Solicitudes, elige técnico, hora y estado.',go:'e-solicitudes',ok:()=>mine().some(r=>EST.indexOf(r.estado)>=2)},
+ {who:'c',t:'Mira el seguimiento',d:'El cliente recibe el aviso y ve quién va y a qué hora.',go:'solicitudes',ok:()=>!!S.flags.vio},
+ {who:'e',t:'Cierra con el parte firmado',d:'El técnico rellena el parte y el cliente firma en su móvil.',go:'e-solicitudes',ok:()=>mine().some(r=>r.parte&&r.parte.firma)},
+ {who:'c',t:'Deja una reseña',d:'Desde el trabajo terminado, en Mis cosas.',go:'solicitudes',ok:()=>S.reviews.length>0},
+ {who:'e',t:'Publica la reseña',d:'Revísala, contesta y publícala.',go:'e-resenas',ok:()=>S.reviews.some(x=>x.estado==='publicada')}
+];
+let tourDone=TOUR.filter(s=>s.ok()).length;
+function tourHTML(){return TOUR.map((s,i)=>{const ok=s.ok();return `<div class="tstep ${ok?'done':''}"><span class="n">${ok?'✓':i+1}</span><div class="grow"><span class="who ${s.who}">${s.who==='c'?'Cliente':'Empresa'}</span><div style="font-weight:700;margin-top:4px">${s.t}</div><div class="small muted">${s.d}</div></div><button class="btn btn-sm ${ok?'btn-ghost':'btn-main'}" data-go="${s.go}">${ok?'Ver':'Ir'}</button></div>`}).join('')}
+function checkTour(){const n=TOUR.filter(s=>s.ok()).length;if(MODE!=='demo'){tourDone=n;return}$('#tourCount').textContent=n+'/6';
+  if(n>tourDone){const next=TOUR.find(s=>!s.ok());setTimeout(()=>toast(next?`Paso ${n} hecho. Siguiente: ${next.t.toLowerCase()} (${next.who==='c'?'cliente':'empresa'})`:'¡Recorrido completo! Así funciona todo el circuito.'),400)}
+  tourDone=n;if(current==='portada')$('#tourList').innerHTML=tourHTML()}
+$('#tourBtn').onclick=()=>openSheet(`<h2>Recorrido guiado</h2><p class="muted small" style="margin:6px 0 14px">Sigue los pasos alternando entre cliente y empresa.</p><div class="tourlist">${tourHTML()}</div>`);
+R.portada=()=>{$('#tourList').innerHTML=tourHTML()};
+$('#resetAll').onclick=()=>{const l=S.lang;S=seed();S.lang=l;logged=false;tourDone=0;save();go('portada');toast('Demo reiniciada')};
+
+/* =========================================================
+   IDIOMA
+   ========================================================= */
+function applyLang(){$$('[data-i18n]').forEach(el=>{if(el.dataset.es===undefined)el.dataset.es=el.textContent;el.textContent=(S.lang==='en'&&EN[el.dataset.i18n])||el.dataset.es});
+  $('#langBtn').textContent=S.lang==='es'?'EN':'ES';document.documentElement.lang=S.lang;renderHomeSvcs();if(current==='servicios')renderSvcs(svcF);renderFAQ()}
+function toggleLang(){S.lang=S.lang==='es'?'en':'es';save();applyLang();toast(S.lang==='en'?'English version (main screens)':'Versión en español')}
+$('#langBtn').onclick=toggleLang;
+
+/* =========================================================
+   CLIENTE
+   ========================================================= */
+/* Termostato */
+let temp=24;
+function setMode(m){document.body.classList.toggle('heat',m==='heat');$$('.seg button[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));temp=m==='heat'?21:24;$('#tval').textContent=temp}
+$$('.seg button[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+$('#tup').onclick=()=>{temp=Math.min(30,temp+1);$('#tval').textContent=temp;if(temp>=25&&!document.body.classList.contains('heat'))setMode('heat')};
+$('#tdown').onclick=()=>{temp=Math.max(16,temp-1);$('#tval').textContent=temp;if(temp<=20&&document.body.classList.contains('heat'))setMode('cold')};
+$('#years').textContent=new Date().getFullYear()-1995;
+$('#waFab').href=wa(WHATSAPP,'Hola, os escribo desde la app de Air-Limp.');$('#waContact').href=$('#waFab').href;
+
+/* Inicio */
+R.inicio=()=>{
+  $('#promoBox').innerHTML=S.promo.on?`<div class="promo"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#EC963A"/><path d="M17 31 31 17" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="18" r="3" fill="#fff"/><circle cx="30" cy="30" r="3" fill="#fff"/></svg><div class="grow"><b>${esc(S.promo.t)}</b><span class="small">${esc(S.promo.x)}</span></div><button class="btn btn-sm btn-main" data-go="cita">Pedir cita</button></div>`:'';
+  renderHomeSvcs();
+  const pub=S.reviews.filter(r=>r.estado==='publicada');
+  $('#homeRevs').innerHTML=pub.length?`<div class="reviews">${pub.slice(0,3).map(revCard).join('')}</div>`:`<div class="empty"><h3>Aún no hay reseñas publicadas</h3><p class="small muted">Aquí solo aparecen reseñas de clientes reales, revisadas por Air-Limp.</p><button class="btn btn-main btn-sm" data-go="resenas">Dejar la primera</button></div>`;
+};
+const svcName=s=>S.lang==='en'?s.en:s.name, svcDesc=s=>S.lang==='en'?s.desc_en:s.desc;
+const svcCard=s=>`<button class="svc" data-svc="${s.id}"><div class="ic">${ICON[s.id]}</div><div><h3>${svcName(s)}</h3><p>${svcDesc(s)}</p><div class="for">${s.for.length>1?'Particulares y empresas':'Empresas y comunidades'}</div></div></button>`;
+function renderHomeSvcs(){$('#homeSvcs').innerHTML=SERVICES.slice(0,3).map(svcCard).join('')}
+let svcF='todos';
+function renderSvcs(f){svcF=f;$$('#svcFilters .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));$('#allSvcs').innerHTML=SERVICES.filter(s=>f==='todos'||s.for.includes(f)).map(svcCard).join('')}
+R.servicios=o=>renderSvcs(o.filter||'todos');
+$$('#svcFilters .chip').forEach(c=>c.onclick=()=>renderSvcs(c.dataset.f));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-svc]');if(!b)return;const s=SERVICES.find(x=>x.id===b.dataset.svc);
+  openSheet(`<div class="row" style="flex-wrap:nowrap;gap:14px"><div class="ic">${ICON[s.id]}</div><h2>${svcName(s)}</h2></div><p style="margin-top:12px">${svcDesc(s)}</p><h3 style="margin-top:16px">Qué incluye</h3><ul>${s.inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn btn-flow btn-block" id="svcQuote">${s.id==='mantenimiento'?'Ver planes de mantenimiento':'Pedir presupuesto'}</button>`);
+  $('#svcQuote').onclick=()=>{if(s.id==='mantenimiento')return go('planes');Object.assign(Q,{step:0,quien:'',servicio:s.id==='chimenea'?'campana':s.id});go('presupuesto')}});
+$('#brands').innerHTML=BRANDS.map(b=>`<button class="chip" data-brand="${b}">${b}</button>`).join('');
+$('#avMarca').innerHTML+=BRANDS.map(b=>`<option>${b}</option>`).join('');
+$('#avSint').innerHTML+=GUIA.map(g=>`<option>${g.s}</option>`).join('');
+$$('[data-brand]').forEach(c=>c.onclick=()=>{go('averia');$('#avMarca').value=c.dataset.brand;toast('Marca '+c.dataset.brand+' seleccionada')});
+
+/* Presupuesto */
+const Q={step:0,quien:'',servicio:'',m2:60,estancias:2,fotos:[],nota:''};
+const QSVC=[['split','Aire acondicionado split'],['conductos','Climatización por conductos'],['bomba','Bomba de calor o aerotermia'],['ventilacion','Ventilación de garaje o local'],['campana','Campana o chimenea'],['mantenimiento','Contrato de mantenimiento']];
+function estimate(q=Q){const{servicio:s,m2,estancias:n}=q;let a,b;
+  if(s==='split'){a=950*n;b=1450*n}else if(s==='conductos'){a=3200+m2*25;b=4800+m2*35}else if(s==='bomba'){a=6500+m2*20;b=10500+m2*30}
+  else if(s==='ventilacion'){a=1500+m2*12;b=3500+m2*20}else if(s==='campana'){a=600;b=2200}else{a=70*n;b=120*n}
+  if(q.quien==='empresa'){a*=1.1;b*=1.15}return[a,b]}
+function cuota(P,m,tin=.0795){const i=tin/12;return P*i/(1-Math.pow(1+i,-m))}
+function renderQuote(){
+  const total=5;$('#qSteps').innerHTML=Array.from({length:total},(_,i)=>`<i class="${i<=Q.step?'on':''}"></i>`).join('');
+  const B=$('#qBody');let h='',ok=true;
+  if(Q.step===0){h=`<h3>¿Para quién es?</h3><div class="opts two" style="margin-top:14px"><button class="opt ${Q.quien==='particular'?'on':''}" data-q="quien" data-v="particular">${ICON.split}<div><b>Para mi casa</b><small>Vivienda o segunda residencia</small></div></button><button class="opt ${Q.quien==='empresa'?'on':''}" data-q="quien" data-v="empresa">${ICON.ventilacion}<div><b>Para una empresa</b><small>Local, nave, oficina o comunidad</small></div></button></div>`;ok=!!Q.quien}
+  if(Q.step===1){h=`<h3>¿Qué necesitas?</h3><div class="opts" style="margin-top:14px">${QSVC.map(([k,n])=>`<button class="opt ${Q.servicio===k?'on':''}" data-q="servicio" data-v="${k}">${ICON[k]}<div><b>${n}</b></div></button>`).join('')}</div>`;ok=!!Q.servicio}
+  if(Q.step===2){h=`<h3>Cuéntanos el espacio</h3><label class="f" style="margin-top:14px">Superficie total <span class="rangeval" id="qm2v">${Q.m2} m²</span><input type="range" min="10" max="600" step="5" value="${Q.m2}" id="qm2"></label><label class="f">${Q.servicio==='mantenimiento'?'Número de equipos':'Número de estancias a climatizar'}<input type="number" min="1" max="30" value="${Q.estancias}" id="qn"></label>`}
+  if(Q.step===3){h=`<h3>Fotos y detalles</h3><p class="small muted">Opcional, pero nos ayuda a afinar el precio: el sitio del equipo, la fachada, el cuadro eléctrico…</p><label class="f" style="margin-top:14px">Fotos<input type="file" accept="image/*" multiple id="qf"><div class="thumbs" id="qth">${Q.fotos.map(u=>`<img src="${u}" alt="">`).join('')}</div></label><label class="f">Comentarios<textarea id="qnota" placeholder="Por ejemplo: quiero quitar la caldera de gasóleo">${esc(Q.nota)}</textarea></label>`}
+  if(Q.step===4){h=`<h3>¿A quién llamamos?</h3><label class="f" style="margin-top:14px">Nombre<input type="text" id="qnom" value="${esc(S.yo.nombre)}" autocomplete="name"></label><label class="f">Teléfono<input type="tel" id="qtel" value="${esc(S.yo.tel)}" autocomplete="tel"></label><label class="f">Municipio<input type="text" id="qlug" value="${esc(S.yo.lugar)}"></label>`;ok=S.yo.nombre&&S.yo.tel}
+  if(Q.step===5){const[a,b]=estimate(),mid=(a+b)/2,sv=QSVC.find(x=>x[0]===Q.servicio)[1];
+    h=`<div class="estimate"><span class="small" style="color:#b9cfd2">Precio orientativo · ${sv}</span><div class="big">${eur(a)} – ${eur(b)}</div>${mid>900?`<span class="small" style="color:#b9cfd2">O a plazos, desde:</span><div class="fin">${[12,24,36].map(m=>`<div><b>${eur2(cuota(mid,m)).replace(/,\d\d €/,' €')}</b><span class="small">/mes · ${m} meses</span></div>`).join('')}</div>`:''}<p style="margin-top:12px">Cifras de ejemplo para la demo: Air-Limp pondría sus precios reales. Financiación sujeta a aprobación. El presupuesto definitivo se envía tras la visita.</p></div>
+    <p style="margin-top:16px"><b>Solicitud enviada.</b> La empresa ya la tiene en su panel. Puedes seguirla en Mis cosas.</p>
+    <div class="nav-row"><button class="btn btn-ghost" id="qnew">Nuevo presupuesto</button><button class="btn btn-main" data-go="solicitudes">Seguir mi solicitud</button></div>`;
+    $('#qSteps').innerHTML=Array.from({length:total},()=>`<i class="on"></i>`).join('')}
+  if(Q.step<5)h+=`<div class="nav-row">${Q.step>0?'<button class="btn btn-ghost" id="qback">Atrás</button>':''}<button class="btn btn-main" id="qnext" ${ok?'':'disabled'}>${Q.step===4?'Ver precio y enviar':'Siguiente'}</button></div>`;
+  B.innerHTML=h;
+  B.querySelectorAll('[data-q]').forEach(o=>o.onclick=()=>{Q[o.dataset.q]=o.dataset.v;renderQuote()});
+  const m=$('#qm2');if(m)m.oninput=()=>{Q.m2=+m.value;$('#qm2v').textContent=Q.m2+' m²'};
+  const n=$('#qn');if(n)n.oninput=()=>Q.estancias=Math.max(1,+n.value||1);
+  const f=$('#qf');if(f)f.onchange=async()=>{Q.fotos.push(...await readImgs(f));$('#qth').innerHTML=Q.fotos.map(u=>`<img src="${u}" alt="">`).join('')};
+  const no=$('#qnota');if(no)no.oninput=()=>Q.nota=no.value;
+  [['qnom','nombre'],['qtel','tel'],['qlug','lugar']].forEach(([id,k])=>{const el=$('#'+id);if(el)el.oninput=()=>{S.yo[k]=el.value;$('#qnext').disabled=!(S.yo.nombre&&S.yo.tel)}});
+  const nx=$('#qnext');if(nx)nx.onclick=()=>{Q.step++;if(Q.step===5){const[a,b]=estimate();addReq({tipo:'presupuesto',titulo:QSVC.find(x=>x[0]===Q.servicio)[1]+' · '+Q.m2+' m²',quien:S.yo.nombre,tel:S.yo.tel,lugar:S.yo.lugar,extra:'Orientativo '+eur(a)+' – '+eur(b)+(Q.nota?' · '+Q.nota:''),fotos:Q.fotos.slice(),presu:{servicio:Q.servicio,m2:Q.m2,n:Q.estancias,a,b,quien:Q.quien}})}renderQuote();window.scrollTo({top:0})};
+  const bk=$('#qback');if(bk)bk.onclick=()=>{Q.step--;renderQuote()};
+  const nw=$('#qnew');if(nw)nw.onclick=()=>{Object.assign(Q,{step:0,quien:'',servicio:'',fotos:[],nota:''});renderQuote()};
+}
+R.presupuesto=()=>{if(Q.step===5)Object.assign(Q,{step:0,quien:'',servicio:'',fotos:[],nota:''});renderQuote()};
+
+/* Avería */
+let urg='Esta semana',avFotos=[];
+$$('#avUrg button').forEach(b=>b.onclick=()=>{urg=b.dataset.u;$$('#avUrg button').forEach(x=>x.classList.toggle('on',x===b))});
+$('#avFiles').onchange=async e=>{avFotos=await readImgs(e.target);$('#avThumbs').innerHTML=avFotos.map(u=>`<img src="${u}" alt="">`).join('')};
+R.averia=o=>{if(o.arg)$('#avSint').value=o.arg};
+$('#avForm').onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));saveYo(d.nombre,d.tel,d.lugar);
+  addReq({tipo:'averia',titulo:d.equipo+' · '+d.sintoma.toLowerCase(),quien:d.nombre,tel:d.tel,lugar:d.lugar,extra:[d.marca,urg,d.codigo&&'Código '+d.codigo,d.detalle].filter(Boolean).join(' · '),fotos:avFotos,urg});
+  notify('Hemos recibido tu aviso de avería. Te llamaremos '+(urg==='Urgente'?'lo antes posible.':'para darte día.'),'solicitudes');save();
+  e.target.reset();avFotos=[];$('#avThumbs').innerHTML='';fillYo();
+  openSheet(`<h2>Aviso recibido</h2><p style="margin-top:10px">La empresa ya lo tiene en su panel. Un técnico te llamará ${urg==='Urgente'?'lo antes posible':'para darte día'}. Si gotea o huele a quemado, déjalo apagado.</p><div class="nav-row"><button class="btn btn-ghost" data-go="inicio">Inicio</button><button class="btn btn-main" data-go="solicitudes">Seguir el aviso</button></div>`)};
+
+/* Guía */
+$('#guiaList').innerHTML=GUIA.map(g=>`<details><summary>${g.s}</summary><div class="body"><ul>${g.c.map(x=>`<li>${x}</li>`).join('')}</ul><div><button class="btn btn-sm btn-main" data-go="averia" data-arg="${g.s}">Avisar de esta avería</button></div></div></details>`).join('');
+
+/* Cita */
+let cDay=null,cSlot=null;
+function renderDays(){const out=[];const d=new Date();d.setHours(0,0,0,0);while(out.length<14){d.setDate(d.getDate()+1);if(d.getDay()!==0)out.push(new Date(d))}
+  $('#days').innerHTML=out.map((x,i)=>`<button class="day ${cDay&&+cDay===+x?'on':''}" data-i="${i}"><small>${x.toLocaleDateString('es-ES',{weekday:'short'})}</small><b>${x.getDate()}</b><small>${x.toLocaleDateString('es-ES',{month:'short'})}</small></button>`).join('');
+  $$('#days .day').forEach(b=>b.onclick=()=>{cDay=out[+b.dataset.i];cSlot=null;renderDays()});
+  if(!cDay){$('#slots').innerHTML='<p class="small muted" style="grid-column:1/-1">Elige un día para ver las horas libres.</p>';return checkCita()}
+  const hrs=cDay.getDay()===6?['09:00','10:30','12:00']:['09:00','10:30','12:00','16:00','17:30','19:00'];const sd=cDay.getDate();
+  $('#slots').innerHTML=hrs.map((h,i)=>`<button class="slot ${cSlot===h?'on':''}" data-h="${h}" ${(sd*7+i*3)%5===0?'disabled':''}>${h}</button>`).join('');
+  $$('#slots .slot').forEach(b=>b.onclick=()=>{cSlot=b.dataset.h;renderDays()});checkCita()}
+function checkCita(){$('#citaOk').disabled=!(cDay&&cSlot&&$('#citaNombre').value&&$('#citaTel').value)}
+['#citaNombre','#citaTel'].forEach(s=>$(s).addEventListener('input',checkCita));
+R.cita=()=>{renderDays()};
+$('#citaOk').onclick=()=>{const f=cDay.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});saveYo($('#citaNombre').value,$('#citaTel').value,$('#citaLugar').value);
+  addReq({tipo:'cita',titulo:$('#citaMotivo').value,quien:S.yo.nombre,tel:S.yo.tel,lugar:S.yo.lugar,extra:'Pedida para el '+f+' a las '+cSlot,dia:ymd(cDay),hora:cSlot});
+  notify('Cita solicitada para el '+f+' a las '+cSlot+'. Te la confirmamos por teléfono.','solicitudes');save();
+  openSheet(`<h2>Cita solicitada</h2><p style="margin-top:10px">${esc($('#citaMotivo').value)}, el ${f} a las ${cSlot}. Te llamaremos para confirmarla.</p><button class="btn btn-main btn-block" style="margin-top:16px" data-go="solicitudes">Ver en Mis cosas</button>`);cDay=cSlot=null};
+
+/* Calculadoras */
+function calc(){const m=+$('#cRange').value;$('#cM2').textContent=m+' m²';let f=m*100*(+$('#cOri').value)*(+$('#cTipo').value)*($('#cTop').checked?1.1:1);const kw=f/860;
+  $('#cF').textContent=new Intl.NumberFormat('es-ES').format(Math.round(f/100)*100);$('#cK').textContent=kw.toFixed(1).replace('.',',')+' kW';
+  const std=[2.5,3.5,5,6,7.1,10,12.5].find(x=>x>=kw);$('#cTip').textContent=std?`Un equipo de unos ${String(std).replace('.',',')} kW encaja bien. Si la estancia es muy abierta, mejor conductos o varios splits.`:'Para esta superficie conviene un sistema por conductos o varios equipos. Pide una visita.'}
+['#cRange','#cOri','#cTipo','#cTop'].forEach(s=>$(s).addEventListener('input',calc));calc();
+function ahorro(){const g=+$('#aG').value,p=+$('#aSis').value;$('#aGv').textContent=eur(g);$('#aY').textContent=eur(g*p);$('#aD').textContent=eur(g*p*10)}
+['#aG','#aSis'].forEach(s=>$(s).addEventListener('input',ahorro));ahorro();
+$('#aGo').onclick=()=>{Object.assign(Q,{step:0,quien:'particular',servicio:'bomba'});go('presupuesto')};
+
+/* Planes */
+$('#plans').innerHTML=PLANS.map(p=>`<div class="plan ${p.star?'star':''}">${p.star?'<span class="pill dark" style="justify-self:start">El más elegido</span>':''}<h3 style="font-size:1.4rem">${p.n}</h3><span class="muted small">${p.d}</span><div class="price">${p.p?p.p+' €':'A medida'}<small>${p.per}</small></div><ul>${p.inc.map(i=>`<li>${i}</li>`).join('')}</ul><button class="btn ${p.star?'btn-flow':'btn-main'}" data-plan="${p.id}">${p.p?'Contratar':'Pedir estudio'}</button></div>`).join('');
+$$('[data-plan]').forEach(b=>b.onclick=()=>{const p=PLANS.find(x=>x.id===b.dataset.plan);
+  openSheet(`<h2>Plan ${p.n}</h2><p class="muted" style="margin:6px 0 16px">${p.p?p.p+' € al año. ':''}Te llamamos para confirmar los datos y la primera revisión.</p><form id="plF"><label class="f">Nombre<input type="text" name="nombre" required class="yo-nombre"></label><label class="f">Teléfono<input type="tel" name="tel" required class="yo-tel"></label><label class="f">Municipio<input type="text" name="lugar" class="yo-lugar"></label><label class="f">Número de equipos<input type="number" name="n" min="1" value="1"></label><button class="btn btn-main btn-block">${p.p?'Contratar plan':'Pedir estudio'}</button></form>`);fillYo();
+  $('#plF').onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));saveYo(d.nombre,d.tel,d.lugar);
+    S.contratos.unshift({id:Date.now(),plan:p.n,precio:p.p,nombre:d.nombre,tel:d.tel,lugar:d.lugar,n:d.n,fecha:Date.now(),estado:'Pendiente de firma'});
+    addReq({tipo:'contrato',titulo:'Plan '+p.n+' · '+d.n+' equipo(s)',quien:d.nombre,tel:d.tel,lugar:d.lugar,extra:p.p?p.p+' €/año':'Estudio a medida'});
+    notify('Hemos recibido tu solicitud del plan '+p.n+'. Te llamaremos para cerrarlo.','solicitudes');save();
+    openSheet(`<h2>¡Solicitud enviada!</h2><p style="margin-top:10px">Te llamaremos para confirmar el plan ${p.n}.</p><button class="btn btn-main btn-block" style="margin-top:16px" data-go="solicitudes">Ver en Mis cosas</button>`)}});
+
+/* Mis solicitudes */
+const TIPO={presupuesto:'Presupuesto',averia:'Avería',cita:'Cita',revision:'Revisión',contrato:'Plan de mantenimiento'};
+function trackHTML(est){const i=EST.indexOf(est);return `<div class="track">${EST.map((s,k)=>`<div class="${k<i||est==='Terminada'?'done':k===i?'now':''}"><i></i>${s}</div>`).join('')}</div>`}
+R.solicitudes=()=>{
+  const list=mine();
+  if(list.some(r=>EST.indexOf(r.estado)>=2)&&!S.flags.vio){S.flags.vio=true;save()}
+  $('#myReqs').innerHTML=list.length?list.map(r=>{const reviewed=S.reviews.some(v=>v.reqId==r.id);
+    return `<div class="card"><div class="card-top"><div><span class="pill">${TIPO[r.tipo]}</span><h3 style="margin-top:6px">${esc(r.titulo)}</h3><span class="small muted">Enviada ${ago(r.fecha)}</span></div></div>
+    ${trackHTML(r.estado)}
+    ${r.tecnico?`<div class="small"><b>${esc(r.tecnico)}</b>${r.hora?' · '+fmtDay(r.dia)+' a las '+r.hora:''}${r.estado==='En camino'?' · <span class="pill heat">Va de camino</span>':''}</div>`:'<div class="small muted">Pendiente de asignar técnico. Te avisamos en cuanto lo tengamos.</div>'}
+    <div class="row">
+      ${r.presuFinal?`<button class="btn btn-sm ${r.aceptado?'btn-ghost':'btn-flow'}" data-vp="${r.id}">${r.aceptado?'Presupuesto aceptado':'Ver presupuesto'}</button>`:''}
+      ${r.parte?`<button class="btn btn-sm btn-ghost" data-vparte="${r.id}">Ver parte de trabajo</button>`:''}
+      ${r.estado==='Terminada'&&!reviewed?`<button class="btn btn-sm btn-main" data-val="${r.id}">Valorar el trabajo</button>`:''}
+      ${reviewed?'<span class="pill ok">Reseña enviada</span>':''}
+      ${r.estado!=='Terminada'?`<a class="btn btn-sm btn-ghost" href="tel:+34${PHONE}">Llamar</a>`:''}
+    </div></div>`}).join(''):`<div class="empty">${ICON.split.replace('<svg','<svg style="width:70px"')}<h3>Todavía no has pedido nada</h3><p class="small muted">Tus presupuestos, avisos y citas aparecerán aquí con su estado.</p><button class="btn btn-main btn-sm" data-go="pedir">Hacer una solicitud</button></div>`;
+  $$('[data-val]').forEach(b=>b.onclick=()=>{const r=S.reqs.find(x=>x.id==b.dataset.val);go('resenas',{req:r})});
+  $$('[data-vparte]').forEach(b=>b.onclick=()=>parteView(S.reqs.find(x=>x.id==b.dataset.vparte)));
+  $$('[data-vp]').forEach(b=>b.onclick=()=>presuView(S.reqs.find(x=>x.id==b.dataset.vp),true));
+};
+function parteView(r){const p=r.parte;openSheet(`<h2>Parte de trabajo</h2><p class="small muted" style="margin:6px 0 12px">${esc(r.titulo)} · ${esc(r.tecnico)} · ${fmt(p.fecha)}</p>
+  <h3>Trabajo realizado</h3><p style="margin:4px 0 12px">${esc(p.trabajo)||'—'}</p>${p.material?`<h3>Materiales</h3><p style="margin:4px 0 12px">${esc(p.material)}</p>`:''}<p class="small"><b>Tiempo:</b> ${esc(p.horas)} h</p>
+  ${p.antes.length||p.despues.length?`<div class="two-col" style="margin-top:12px"><div><b class="small">Antes</b><div class="thumbs">${p.antes.map(u=>`<img src="${u}" alt="">`).join('')||'<span class="small muted">Sin fotos</span>'}</div></div><div><b class="small">Después</b><div class="thumbs">${p.despues.map(u=>`<img src="${u}" alt="">`).join('')||'<span class="small muted">Sin fotos</span>'}</div></div></div>`:''}
+  <h3 style="margin-top:14px">Firma del cliente</h3><img src="${p.firma}" alt="Firma" style="border:1px solid var(--line);border-radius:12px;margin-top:6px;background:#fff">`)}
+
+/* Equipos */
+const addMonths=(d,n)=>{const x=new Date(d);x.setMonth(x.getMonth()+n);return x};
+R.equipos=()=>{
+  if(!S.equipos.length){$('#eqList').innerHTML=`<div class="empty">${ICON.split.replace('<svg','<svg style="width:70px"')}<h3>Aún no tienes equipos</h3><p class="small muted">Añade tu aire acondicionado y te recordamos la revisión anual y la limpieza de filtros.</p></div>`;return}
+  const now=Date.now();
+  $('#eqList').innerHTML=S.equipos.map((q,i)=>{const next=addMonths(q.rev,12),fil=addMonths(q.fil||q.rev,3);const pct=Math.min(100,Math.max(0,(now-new Date(q.rev))/(next-new Date(q.rev))*100));const late=now>next;const gar=q.inst?addMonths(q.inst,36):null;
+    return `<div class="card"><div class="card-top"><div class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:12px">${q.foto?`<img src="${q.foto}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:12px">`:`<div class="ic" style="width:56px;height:56px">${ICON[q.ico]||ICON.split}</div>`}<div><h3>${esc(q.tipo)}</h3><span class="small muted">${esc(q.marca||'Marca sin indicar')}${q.modelo?' · '+esc(q.modelo):''}${q.lugar?' · '+esc(q.lugar):''}</span></div></div><span class="pill ${late?'warn':'ok'}">${late?'Revisión pendiente':'Al día'}</span></div>
+    <div class="meter"><i class="${late?'late':''}" style="width:${pct}%"></i></div>
+    <div class="small"><b>Próxima revisión:</b> ${fmt(next)}<br><b>Limpiar filtros:</b> ${now>fil?'ya toca':fmt(fil)}${gar?`<br><b>Garantía:</b> ${now>gar?'vencida el '+fmt(gar):'hasta el '+fmt(gar)}`:''}</div>
+    <div><b class="small">Facturas y documentos</b><div class="docs" style="margin-top:6px">${(q.docs||[]).map(d=>`<span class="doc">${d.img?`<img src="${d.img}" alt="">`:'📄'}${esc(d.n)}</span>`).join('')||'<span class="small muted">Ninguno todavía</span>'}<label class="doc" style="cursor:pointer">＋ Añadir<input type="file" accept="image/*,application/pdf" data-doc="${i}" hidden></label></div></div>
+    <div class="row"><button class="btn btn-main btn-sm" data-rev="${i}">Pedir revisión</button><button class="btn btn-ghost btn-sm" data-fil="${i}">Filtros limpios</button><button class="link small" data-del="${i}">Quitar</button></div></div>`}).join('');
+  $$('[data-rev]').forEach(b=>b.onclick=()=>{const q=S.equipos[+b.dataset.rev];addReq({tipo:'revision',titulo:'Revisión · '+q.tipo,quien:S.yo.nombre||'Cliente de la app',tel:S.yo.tel||'—',lugar:q.lugar,extra:[q.marca,q.modelo].filter(Boolean).join(' · ')});toast('Revisión pedida. Te llamaremos para darte día')});
+  $$('[data-fil]').forEach(b=>b.onclick=()=>{S.equipos[+b.dataset.fil].fil=new Date().toISOString();save();R.equipos();toast('Hecho. Te avisamos dentro de 3 meses')});
+  $$('[data-del]').forEach(b=>b.onclick=()=>{S.equipos.splice(+b.dataset.del,1);save();R.equipos()});
+  $$('[data-doc]').forEach(inp=>inp.onchange=async()=>{const f=inp.files[0];if(!f)return;const q=S.equipos[+inp.dataset.doc];q.docs=q.docs||[];q.docs.push({n:f.name.length>22?f.name.slice(0,20)+'…':f.name,img:f.type.startsWith('image')?await compress(f,300):null});save();R.equipos();toast('Documento guardado')});
+};
+$('#addEq').onclick=()=>{openSheet(`<h2>Añadir equipo</h2><form id="eqF" style="margin-top:14px">
+  <div class="f">Foto de la etiqueta del equipo<label class="btn btn-ghost" style="cursor:pointer">📷 Hacer foto a la etiqueta<input type="file" accept="image/*" capture="environment" id="eqCam" hidden></label><div class="thumbs" id="eqTh"></div><span class="small muted">Con la foto, Air-Limp identifica marca y modelo sin que tengas que escribirlos.</span></div>
+  <label class="f">Tipo<select name="tipo"><option data-i="split">Split de pared</option><option data-i="conductos">Aire por conductos</option><option data-i="bomba">Bomba de calor / aerotermia</option><option data-i="ventilacion">Ventilación</option><option data-i="campana">Campana extractora</option></select></label>
+  <div class="row"><label class="f grow">Marca<select name="marca"><option value="">No lo sé</option>${BRANDS.map(b=>`<option>${b}</option>`).join('')}</select></label><label class="f grow">Modelo<input type="text" name="modelo" placeholder="Opcional"></label></div>
+  <label class="f">Dónde está<input type="text" name="lugar" placeholder="Salón, local, oficina…"></label>
+  <div class="row"><label class="f grow">Fecha de instalación<input type="date" name="inst"></label><label class="f grow">Última revisión<input type="date" name="rev" required value="${ymd(new Date(Date.now()-300*864e5))}"></label></div>
+  <button class="btn btn-main btn-block">Guardar equipo</button></form>`);
+  let foto=null;$('#eqCam').onchange=async e=>{foto=await compress(e.target.files[0],500);if(foto)$('#eqTh').innerHTML=`<img src="${foto}" alt="">`};
+  $('#eqF').onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));d.ico=e.target.tipo.selectedOptions[0].dataset.i;d.foto=foto;d.docs=[];S.equipos.push(d);save();closeSheet();R.equipos();toast('Equipo guardado. Te avisaremos de sus revisiones')}};
+
+/* Avisos */
+R.notifs=()=>{$('#notifList').innerHTML=S.notifs.length?S.notifs.map(n=>`<div class="card" style="${n.leida?'':'border-color:var(--ink)'}"><div class="card-top"><div>${n.leida?'':'<span class="pill dark">Nuevo</span> '}<span class="small muted">${ago(n.fecha)}</span><p style="margin-top:6px">${esc(n.texto)}</p></div></div>${n.go?`<div><button class="btn btn-sm btn-ghost" data-go="${n.go}">Ver</button></div>`:''}</div>`).join(''):`<div class="empty"><h3>Sin avisos</h3><p class="small muted">Aquí te avisamos cuando asignemos un técnico, vaya de camino o te enviemos un presupuesto.</p></div>`;
+  if(S.notifs.some(n=>!n.leida)){S.notifs.forEach(n=>n.leida=true);setTimeout(save,600)}};
+
+/* Obras */
+function scene(k,i){const pal=['#D3EEF1','#FCE9D3','#E4F1F0','#E7EEF6'][i%4];const base=`<rect width="320" height="240" fill="${pal}"/><rect y="190" width="320" height="50" fill="#0F2A30" opacity=".07"/>`;
+  if(k==='hogar')return base+`<path d="M70 190v-80l90-60 90 60v80z" fill="#fff"/><path d="M56 118 160 46l104 72" stroke="#0F2A30" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="100" y="120" width="60" height="18" rx="5" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><path d="M110 146c6 10 16 10 22 0s16-10 22 0" stroke="#2AA3B6" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="180" y="140" width="34" height="50" fill="#EC963A"/><rect x="262" y="150" width="28" height="40" rx="4" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><circle cx="276" cy="170" r="9" fill="none" stroke="#0F2A30" stroke-width="2.5"/>`;
+  if(k==='garaje')return base+`<rect x="30" y="70" width="260" height="120" fill="#fff"/><path d="M30 70h260" stroke="#0F2A30" stroke-width="6"/><rect x="60" y="78" width="200" height="16" rx="3" fill="#CFE0DE"/><g stroke="#2AA3B6" stroke-width="3" stroke-dasharray="6 6"><path d="M90 98v30M160 98v30M230 98v30"/></g><rect x="60" y="150" width="80" height="34" rx="10" fill="#1D4650"/><circle cx="78" cy="186" r="8" fill="#0F2A30"/><circle cx="122" cy="186" r="8" fill="#0F2A30"/><rect x="180" y="150" width="80" height="34" rx="10" fill="#EC963A"/><circle cx="198" cy="186" r="8" fill="#0F2A30"/><circle cx="242" cy="186" r="8" fill="#0F2A30"/>`;
+  if(k==='local')return base+`<rect x="40" y="60" width="240" height="130" fill="#fff"/><rect x="40" y="60" width="240" height="22" fill="#1D4650"/><path d="M120 82l-30 40h80l-30-40z" fill="#fff" stroke="#0F2A30" stroke-width="2.5"/><rect x="70" y="150" width="120" height="40" fill="#CFE0DE"/><path d="M110 140c-3-6 3-8 0-14M130 140c-3-6 3-8 0-14" stroke="#EC963A" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="210" y="110" width="50" height="80" rx="4" fill="#D3EEF1" stroke="#0F2A30" stroke-width="2"/>`;
+  return base+`<path d="M20 190V90l70-30v30l70-30v30l70-30v30l70-30v130z" fill="#fff" stroke="#0F2A30" stroke-width="3" stroke-linejoin="round"/><g fill="#2AA3B6"><circle cx="80" cy="140" r="16"/><circle cx="160" cy="140" r="16"/><circle cx="240" cy="140" r="16"/></g><g stroke="#fff" stroke-width="3"><path d="M70 140h20M80 130v20M150 140h20M160 130v20M230 140h20M240 130v20"/></g>`}
+let wf='todas';
+R.obras=()=>{$('#workFilters').innerHTML=['todas',...Object.keys(WORK_LABEL)].map(k=>`<button class="chip ${wf===k?'on':''}" data-w="${k}">${k==='todas'?'Todas':WORK_LABEL[k]}</button>`).join('');
+  $$('[data-w]').forEach(c=>c.onclick=()=>{wf=c.dataset.w;R.obras()});
+  const real=S.obras.filter(w=>wf==='todas'||w.k===wf).map(w=>`<div class="work"><img src="${w.foto}" alt="${esc(w.t)}"><div><b>${esc(w.t)}</b><span>${WORK_LABEL[w.k]}${w.l?' · '+esc(w.l):''}</span></div></div>`);
+  const samp=WORKS.map((w,i)=>({...w,i})).filter(w=>wf==='todas'||w.k===wf).map(w=>`<div class="work"><svg viewBox="0 0 320 240" aria-hidden="true">${scene(w.k,w.i)}</svg><div><b>${w.t}</b><span>${WORK_LABEL[w.k]} · ${w.l} · ilustración de muestra</span></div></div>`);
+  $('#works').innerHTML=real.concat(samp).join('')};
+$('#beforeSvg').innerHTML=`<rect width="320" height="200" fill="#ECE6DC"/><rect y="150" width="320" height="50" fill="#d6cdbf"/><rect x="80" y="40" width="110" height="40" rx="3" fill="#E8E1D3" stroke="#8b8172" stroke-width="3"/><path d="M90 52h90M90 60h90M90 68h90" stroke="#a79c8a" stroke-width="2"/><path d="M130 80v40" stroke="#8b8172" stroke-width="3" stroke-dasharray="4 4"/><text x="20" y="185" font-family="Figtree" font-weight="700" font-size="13" fill="#6b6255">Equipo antiguo · clase baja</text>`;
+$('#afterSvg').innerHTML=`<rect width="320" height="200" fill="#D3EEF1"/><rect y="150" width="320" height="50" fill="#bfe2e7"/><rect x="80" y="44" width="150" height="34" rx="9" fill="#fff" stroke="#0F2A30" stroke-width="3"/><path d="M92 70h126" stroke="#CFE0DE" stroke-width="3" stroke-linecap="round"/><path class="flowline" d="M100 92c8 14 24 14 32 0s24-14 32 0" style="stroke:#2AA3B6"/><path class="flowline" d="M120 114c8 14 24 14 32 0s24-14 32 0" style="stroke:#2AA3B6;opacity:.6;animation-delay:-1s"/><text x="300" y="185" text-anchor="end" font-family="Figtree" font-weight="700" font-size="13" fill="#0F2A30">Inverter de alta eficiencia</text>`;
+$('#cut').oninput=e=>$('#compare').style.setProperty('--cut',e.target.value+'%');
+
+/* Reseñas (cliente) */
+const revCard=r=>`<div class="rev"><div class="row" style="justify-content:space-between"><span class="stars">${stars(r.stars)}</span>${r.reqId?'<span class="pill ok">Cliente verificado</span>':''}</div><p>${esc(r.texto)}</p><span class="small muted">${esc(r.nombre)}${r.lugar?' · '+esc(r.lugar):''} · ${esc(r.servicio)} · ${fmt(r.fecha)}</span>${r.respuesta?`<div class="reply"><b>Respuesta de Air-Limp:</b> ${esc(r.respuesta)}</div>`:''}</div>`;
+let pickStars=5;
+function renderStarPick(){$('#starPick').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" class="${n<=pickStars?'on':''}" data-st="${n}" aria-label="${n} estrellas">★</button>`).join('');$$('#starPick button').forEach(b=>b.onclick=()=>{pickStars=+b.dataset.st;renderStarPick()})}
+$('#revSvc').innerHTML=SERVICES.map(s=>`<option>${s.name}</option>`).join('');
+R.resenas=o=>{
+  const pub=S.reviews.filter(r=>r.estado==='publicada'),avg=pub.length?pub.reduce((a,r)=>a+r.stars,0)/pub.length:0;
+  $('#revSummary').innerHTML=pub.length?`<div class="avg"><b>${avg.toFixed(1).replace('.',',')}</b><div><div class="stars" style="font-size:1.3rem">${stars(Math.round(avg))}</div><span class="small muted">${pub.length} reseña${pub.length>1?'s':''} de clientes reales</span></div></div>`:'';
+  const own=S.reviews.filter(r=>r.estado==='pendiente'&&r.mine);
+  $('#revList').innerHTML=(own.map(r=>revCard(r).replace('<div class="rev">','<div class="rev" style="border-style:dashed"><span class="pill heat" style="justify-self:start">Tu reseña · pendiente de revisión</span>'))).concat(pub.map(revCard)).join('')||`<div class="empty" style="grid-column:1/-1"><h3>Todavía no hay reseñas</h3><p class="small muted">Las reseñas son solo de clientes reales y Air-Limp las revisa antes de publicarlas.</p></div>`;
+  renderStarPick();
+  $('#revReq').value='';
+  if(o&&o.req){$('#revReq').value=o.req.id;const sv=SERVICES.find(s=>o.req.titulo.toLowerCase().includes(s.id))||SERVICES.find(s=>o.req.tipo==='revision'&&s.id==='mantenimiento');if(sv)$('#revSvc').value=sv.name;setTimeout(()=>$('#revForm').scrollIntoView({behavior:'smooth'}),80)}
+};
+$('#revForm').onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));saveYo(d.nombre,null,d.lugar);
+  S.reviews.unshift({id:Date.now(),stars:pickStars,texto:d.texto,nombre:d.nombre,lugar:d.lugar,servicio:d.servicio,reqId:d.reqId?+d.reqId:null,fecha:Date.now(),estado:'pendiente',mine:true,respuesta:''});
+  save();e.target.reset();pickStars=5;R.resenas();window.scrollTo({top:0,behavior:'smooth'});toast('¡Gracias! Se publicará cuando Air-Limp la revise')};
+
+/* FAQ */
+function renderFAQ(){$('#faq').innerHTML=FAQ.map(f=>`<details><summary>${S.lang==='en'?f[2]:f[0]}</summary><div class="body"><p>${S.lang==='en'?f[3]:f[1]}</p></div></details>`).join('')}
+
+/* Zonas */
+$('#zList').innerHTML=ZONAS.map(z=>`<option value="${z}">`).join('');
+$('#zChips').innerHTML=ZONAS.map(z=>`<span class="chip" style="cursor:default">${z}</span>`).join('');
+$('#zIn').oninput=e=>{const v=e.target.value.trim().toLowerCase();if(v.length<3){$('#zOut').innerHTML='';return}
+  const hit=ZONAS.find(z=>z.toLowerCase()===v)||ZONAS.find(z=>z.toLowerCase().startsWith(v));
+  $('#zOut').innerHTML=hit?`<div class="panel" style="background:var(--ok-soft);border-color:#b6dfc7"><b>Sí, trabajamos en ${hit}.</b><p class="small" style="margin:4px 0 12px">Es una de nuestras zonas habituales.</p><div class="row"><button class="btn btn-sm btn-main" data-go="presupuesto">Pedir presupuesto</button><button class="btn btn-sm btn-ghost" data-go="cita">Pedir cita</button></div></div>`:`<div class="panel"><b>Consúltanos.</b><p class="small" style="margin:4px 0 12px">Trabajamos en toda Cantabria y, para empresas, en otras provincias.</p><a class="btn btn-sm btn-main" href="tel:+34${PHONE}">Llamar</a></div>`};
+
+/* =========================================================
+   ASISTENTE (chatbot)
+   ========================================================= */
+const KB=[
+ {k:['horario','abierto','abris','hora','cuando'],a:'Atendemos de lunes a viernes. El horario exacto está pendiente de confirmar con la empresa. Para urgencias puedes llamar al 942 890 424.',acts:[['Llamar','tel'],['Pedir cita','cita']]},
+ {k:['donde','direccion','ubicacion','llegar','estais'],a:'Estamos en el Polígono Industrial Mies de Molladar, Nave E26, en Cartes (Cantabria).',acts:[['Cómo llegar','map'],['Contacto','contacto']]},
+ {k:['telefono','llamar','contacto','whatsapp','email','correo'],a:'Puedes llamarnos al 942 890 424 o escribirnos por WhatsApp desde el botón verde.',acts:[['Llamar','tel'],['WhatsApp','wa']]},
+ {k:['precio','cuesta','cuanto','vale','presupuesto','coste','caro'],a:'Depende del equipo y del espacio. Con el presupuesto guiado ves un precio orientativo en un minuto, y luego te damos el definitivo tras la visita.',acts:[['Pedir presupuesto','presupuesto']]},
+ {k:['plazos','financiar','financiacion','cuotas','pagar','meses'],a:'Sí, puedes pagarlo a plazos. Al final del presupuesto ves una cuota orientativa a 12, 24 o 36 meses (sujeta a aprobación).',acts:[['Pedir presupuesto','presupuesto']]},
+ {k:['gotea','agua','goteo','charco'],a:'Suele ser el desagüe atascado o los filtros sucios. Apaga el equipo, pon un recipiente debajo y mándanos una foto con el aviso.',acts:[['Avisar de la avería','averia:Gotea agua'],['Ver la guía','guia']]},
+ {k:['no enfria','no enfría','calor','caliente','no refresca'],a:'Revisa que esté en modo frío y con la temperatura por debajo de la de la habitación, y limpia los filtros. Si sigue igual, puede faltar gas: mejor que vaya un técnico.',acts:[['Avisar de la avería','averia:Enciende pero no enfría'],['Ver la guía','guia']]},
+ {k:['no calienta','frio','frío'],a:'Comprueba que está en modo calor. Con mucho frío la unidad exterior hace pausas de desescarche de unos minutos, es normal. Si no calienta nunca, avísanos.',acts:[['Avisar de la avería','averia:Enciende pero no calienta']]},
+ {k:['no enciende','apagado','no arranca','no funciona','diferencial','salta'],a:'Mira las pilas del mando y el cuadro eléctrico. Si el diferencial salta otra vez al subirlo, no insistas y avísanos.',acts:[['Avisar de la avería','averia:No enciende']]},
+ {k:['ruido','suena','vibra'],a:'Un zumbido suave es normal. Golpes o ruidos metálicos no: apágalo y avísanos.',acts:[['Avisar de la avería','averia:Hace ruido']]},
+ {k:['olor','huele','quemado','humedad'],a:'Olor a humedad suele ser suciedad en filtros y batería. Si huele a quemado, apágalo desde el cuadro y avísanos como urgente.',acts:[['Avisar de la avería','averia:Huele mal'],['Llamar','tel']]},
+ {k:['codigo','código','error','parpadea','luz'],a:'Cada marca tiene sus códigos. Anota el código o cuántas veces parpadea la luz, haz una foto de la etiqueta y envíanoslo con el aviso.',acts:[['Avisar con el código','averia:Muestra un código de error']]},
+ {k:['filtro','filtros','limpiar','limpieza'],a:'Los filtros conviene limpiarlos cada dos o tres meses con uso diario. Si registras tu equipo en la app, te lo recordamos.',acts:[['Registrar mi equipo','equipos']]},
+ {k:['revision','revisión','mantenimiento','plan','contrato','anual'],a:'Recomendamos una revisión al año. Con un plan de mantenimiento nos encargamos nosotros y tienes prioridad en averías.',acts:[['Ver planes','planes'],['Pedir cita','cita']]},
+ {k:['aerotermia','caldera','gasoleo','gasóleo','ahorro','ahorrar'],a:'La aerotermia da calefacción y agua caliente con mucho menos consumo que una caldera de gasóleo o propano. Calcula tu ahorro aproximado aquí.',acts:[['Calcular ahorro','ahorro'],['Pedir presupuesto','presupuesto']]},
+ {k:['ayuda','subvencion','subvención','ayudas'],a:'Suele haber ayudas para eficiencia energética, pero cambian cada año. Te informamos de las que estén abiertas cuando hagamos el presupuesto.',acts:[['Pedir presupuesto','presupuesto']]},
+ {k:['potencia','frigorias','frigorías','kw','que equipo','qué equipo','tamaño'],a:'Depende de los metros, la orientación y el uso. Con la calculadora te haces una idea en segundos.',acts:[['Calcular potencia','calculadora']]},
+ {k:['garantia','garantía'],a:'Tienes la garantía del fabricante más la de nuestra instalación. En "Mis equipos" puedes ver hasta cuándo dura y guardar las facturas.',acts:[['Mis equipos','equipos']]},
+ {k:['marca','daikin','mitsubishi','fujitsu','carrier'],a:'Trabajamos con Daikin, Mitsubishi Electric, Mitsubishi Heavy Industries, Carrier, Fujitsu, Hitecsa, Kosner y más. Reparamos cualquier marca.',acts:[['Avisar de una avería','averia']]},
+ {k:['zona','trabajais','venis','santander','torrelavega','laredo','castro','municipio','pueblo'],a:'Trabajamos en toda Cantabria y, para empresas, también en otras provincias.',acts:[['Ver zonas','zonas']]},
+ {k:['garaje','ventilacion','ventilación','co','extraccion','extracción','campana','local','nave'],a:'Hacemos ventilación de garajes con detección de CO, renovación de aire en locales y naves, y campanas extractoras a medida.',acts:[['Ver servicios','servicios'],['Pedir presupuesto','presupuesto']]},
+ {k:['estado','solicitud','mi aviso','cuando vienen','tecnico','técnico','seguimiento'],a:'En "Mis cosas" ves el estado de cada solicitud, qué técnico va y a qué hora.',acts:[['Ver mis solicitudes','solicitudes']]},
+ {k:['reseña','opinion','opinión','valorar'],a:'¡Gracias! Puedes dejar tu reseña en la app; la publicamos tras comprobar que eres cliente.',acts:[['Dejar reseña','resenas']]},
+ {k:['hola','buenas','buenos'],a:'¡Hola! Soy el asistente de Air-Limp. Pregúntame lo que quieras sobre tu equipo, precios o citas.'},
+ {k:['gracias','genial','perfecto'],a:'¡A ti! Si necesitas algo más, aquí estoy.'},
+ {k:['persona','humano','tecnico real','hablar con alguien'],a:'Claro. Llámanos o escríbenos por WhatsApp y te atiende una persona del equipo.',acts:[['Llamar','tel'],['WhatsApp','wa']]}
+];
+const SUG=['Mi aire gotea','¿Cuánto cuesta un split?','¿Se puede pagar a plazos?','¿Cada cuánto revisarlo?','¿Dónde estáis?','Hablar con una persona'];
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function answer(q){const n=norm(q);let best=null,sc=0;KB.forEach(e=>{const s=e.k.reduce((a,k)=>a+(n.includes(norm(k))?norm(k).length:0),0);if(s>sc){sc=s;best=e}});
+  return best||{a:'No estoy seguro de haberte entendido. Puedo ayudarte con averías, precios, citas, mantenimiento o la aerotermia. Si prefieres, te pasamos con una persona.',acts:[['Llamar','tel'],['WhatsApp','wa'],['Preguntas frecuentes','ayuda']]}}
+const MAPURL='https://www.google.com/maps/search/?api=1&query=Pol%C3%ADgono+Industrial+Mies+de+Molladar+Nave+E26+Cartes+Cantabria';
+function actEl([l,a]){const href={tel:'tel:+34'+PHONE,wa:wa(WHATSAPP,'Hola, os escribo desde la app de Air-Limp.'),map:MAPURL}[a];return href?`<a href="${href}" target="_blank" rel="noopener">${esc(l)}${a==='tel'?' · 942 890 424':''}</a>`:`<button data-act="${esc(a)}">${esc(l)}</button>`}
+function addMsg(who,html,acts){const d=document.createElement('div');d.className='msg '+who;d.innerHTML=html+(acts&&acts.length?`<div class="acts">${acts.map(actEl).join('')}</div>`:'');$('#chatLog').appendChild(d);$('#chatLog').scrollTop=1e6}
+function ask(q){if(!q.trim())return;addMsg('me',esc(q));const t=document.createElement('div');t.className='msg bot typing';t.innerHTML='<i></i><i></i><i></i>';$('#chatLog').appendChild(t);$('#chatLog').scrollTop=1e6;
+  setTimeout(()=>{t.remove();const r=answer(q);addMsg('bot',esc(r.a),r.acts)},650)}
+function openChat(){closeSheet();const c=$('#chat');c.classList.add('on');if(!$('#chatLog').children.length){addMsg('bot',`¡Hola${S.yo.nombre?', '+esc(S.yo.nombre.split(' ')[0]):''}! Soy el asistente de Air-Limp. ¿En qué te ayudo?`);}
+  $('#chatSug').innerHTML=SUG.map(s=>`<button>${s}</button>`).join('');$$('#chatSug button').forEach(b=>b.onclick=()=>ask(b.textContent));setTimeout(()=>{if(innerWidth>=760)$('#chatIn').focus()},300)}
+function closeChat(){$('#chat').classList.remove('on')}
+$('#chatClose').onclick=closeChat;
+$('#chatForm').onsubmit=e=>{e.preventDefault();const v=$('#chatIn').value;$('#chatIn').value='';ask(v)};
+$('#chatLog').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  if(a==='tel')return location.href='tel:+34'+PHONE;if(a==='wa')return window.open(wa(WHATSAPP,'Hola, os escribo desde la app de Air-Limp.'),'_blank');
+  if(a==='map')return window.open('https://www.google.com/maps/search/?api=1&query=Pol%C3%ADgono+Industrial+Mies+de+Molladar+Nave+E26+Cartes+Cantabria','_blank');
+  const [v,arg]=a.split(':');go(v,{arg})});
+/* Deslizar para cerrar el chat en móvil */
+(()=>{const c=$('#chat'),h=c.querySelector('.chat-h');let y0=null,dy=0;
+  h.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;dy=0;c.style.transition='none'},{passive:true});
+  h.addEventListener('touchmove',e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);c.style.transform=`translateY(${dy}px)`},{passive:true});
+  h.addEventListener('touchend',()=>{c.style.transition='';c.style.transform='';if(dy>90)closeChat();y0=null});
+})();
+
+/* =========================================================
+   EMPRESA
+   ========================================================= */
+$('#lgOk').onclick=()=>{if($('#lgPass').value.trim()==='1995'){logged=true;$('#lgPass').value='';go(afterLogin||'e-inicio')}else toast('Contraseña incorrecta. En la demo es 1995')};
+$('#lgPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgOk').click()});
+$('#logout').onclick=()=>{logged=false;go('portada')};
+
+/* Resumen */
+R['e-inicio']=()=>{
+  const r=S.reqs,t=ymd(),h=new Date().getHours();
+  $('#v-e-inicio h1').textContent=h<14?'Buenos días':h<21?'Buenas tardes':'Buenas noches';
+  $('#eDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  const k=[['Nuevas',r.filter(x=>x.estado==='Recibida').length,'e-solicitudes','Recibida',true],['En curso',r.filter(x=>x.estado==='Asignada'||x.estado==='En camino').length,'e-solicitudes','curso'],['Averías abiertas',r.filter(x=>x.tipo==='averia'&&x.estado!=='Terminada').length,'e-solicitudes','averia'],['Reseñas por revisar',S.reviews.filter(x=>x.estado==='pendiente').length,'e-resenas'],['Contratos',S.contratos.length,'e-contenido']];
+  $('#kpis').innerHTML=k.map(([l,n,g,f,hot])=>`<button class="kpi ${hot&&n?'hot':''}" data-go="${g}" data-filter="${f||''}"><b>${n}</b><span>${l}</span></button>`).join('');
+  const today=r.filter(x=>x.dia===t&&x.tecnico&&x.estado!=='Terminada').sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+  $('#eToday').innerHTML=today.length?today.map(x=>`<div class="stop"><b class="h">${x.hora||'—'}</b><div><b>${esc(x.titulo)}</b><div class="small muted">${esc(x.quien)} · ${esc(x.lugar)} · ${esc(x.tecnico)}</div></div></div>`).join(''):'<p class="small muted">Nada asignado para hoy.</p>';
+  const hist=[19,23,17,28,33],now=new Date();const months=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(d.toLocaleDateString('es-ES',{month:'short'}))}
+  const cur=r.filter(x=>new Date(x.fecha).getMonth()===now.getMonth()).length+9;const vals=[...hist,cur],mx=Math.max(...vals);
+  $('#eMonths').innerHTML=vals.map((v,i)=>`<div><b>${v}</b><i style="height:${v/mx*100}%"></i>${months[i]}</div>`).join('');
+  const cnt=(arr)=>{const m={};arr.forEach(a=>{if(a)m[a]=(m[a]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,4)};
+  const sv=cnt(r.map(x=>TIPO[x.tipo])),zn=cnt(r.map(x=>x.lugar)),bar=(rows)=>{const m=Math.max(1,...rows.map(x=>x[1]));return rows.map(([n,v])=>`<div class="bar-row"><span>${esc(n)}</span><span class="t"><i style="width:${v/m*100}%"></i></span><b>${v}</b></div>`).join('')};
+  $('#eSvcs').innerHTML=bar(sv);$('#eZones').innerHTML=bar(zn);
+};
+
+/* Solicitudes */
+let fEst='activas',fTipo='todas';
+const ESTF=[['activas','Activas'],['Recibida','Nuevas'],['curso','En curso'],['Terminada','Terminadas'],['todas','Todas']];
+const TIPOF=[['todas','Todos los tipos'],['averia','Averías'],['presupuesto','Presupuestos'],['cita','Citas'],['revision','Revisiones'],['contrato','Planes']];
+R['e-solicitudes']=o=>{
+  if(o&&o.filter){if(['averia','presupuesto','cita','revision'].includes(o.filter)){fTipo=o.filter;fEst='activas'}else{fEst=o.filter;fTipo='todas'}}
+  $('#reqEst').innerHTML=ESTF.map(([k,n])=>`<button class="chip ${fEst===k?'on':''}" data-fe="${k}">${n}</button>`).join('');
+  $('#reqTipo').innerHTML=TIPOF.map(([k,n])=>`<button class="chip ${fTipo===k?'on':''}" data-ft="${k}">${n}</button>`).join('');
+  $$('[data-fe]').forEach(b=>b.onclick=()=>{fEst=b.dataset.fe;R['e-solicitudes']()});$$('[data-ft]').forEach(b=>b.onclick=()=>{fTipo=b.dataset.ft;R['e-solicitudes']()});
+  const list=S.reqs.filter(x=>(fTipo==='todas'||x.tipo===fTipo)&&(fEst==='todas'||(fEst==='activas'&&x.estado!=='Terminada')||(fEst==='curso'&&(x.estado==='Asignada'||x.estado==='En camino'))||x.estado===fEst));
+  $('#reqs').innerHTML=list.length?list.map(x=>`<div class="req ${x.tipo}">
+    <div class="req-top"><div class="row"><span class="pill">${TIPO[x.tipo]}</span>${x.mine?'<span class="pill dark">Desde la app</span>':'<span class="demo-tag">Ejemplo</span>'}${x.urg==='Urgente'?'<span class="pill warn">Urgente</span>':''}${x.aceptado?'<span class="pill ok">Presupuesto aceptado</span>':x.presuFinal?'<span class="pill heat">Presupuesto enviado</span>':''}</div><span class="small muted">${ago(x.fecha)}</span></div>
+    <b>${esc(x.titulo)}</b>
+    <span class="small">${esc(x.quien)}${x.lugar?' · '+esc(x.lugar):''} · <a href="tel:${esc(x.tel.replace(/\s/g,''))}">${esc(x.tel)}</a></span>
+    ${x.extra?`<span class="small muted">${esc(x.extra)}</span>`:''}
+    ${x.fotos&&x.fotos.length?`<div class="thumbs">${x.fotos.map(u=>`<img src="${u}" alt="">`).join('')}</div>`:''}
+    <div class="ctrl">
+      <label>Técnico<select data-tec="${x.id}"><option value="">Sin asignar</option>${TECNICOS.map(t=>`<option ${t===x.tecnico?'selected':''}>${t}</option>`).join('')}</select></label>
+      <label>Día<input type="date" data-dia="${x.id}" value="${x.dia||''}"></label>
+      <label>Hora<input type="time" data-hora="${x.id}" value="${x.hora||''}"></label>
+      <label>Estado<select data-est="${x.id}">${EST.map(s=>`<option ${s===x.estado?'selected':''}>${s}</option>`).join('')}</select></label>
+    </div>
+    <div class="row">
+      ${x.estado!=='Terminada'?`<button class="btn btn-sm btn-main" data-parte="${x.id}">Parte de trabajo</button>`:x.parte?`<button class="btn btn-sm btn-ghost" data-vparte="${x.id}">Ver parte</button>`:''}
+      ${x.tipo==='presupuesto'?`<button class="btn btn-sm btn-flow" data-presu="${x.id}">Presupuesto PDF</button>`:''}
+      <a class="btn btn-sm btn-wa" target="_blank" rel="noopener" href="${wa(x.tel,'Hola '+x.quien.split(' ')[0]+', te escribimos de Air-Limp sobre tu solicitud: '+x.titulo+'.')}">WhatsApp</a>
+      ${x.estado==='Terminada'?`<a class="btn btn-sm btn-ghost" target="_blank" rel="noopener" href="${wa(x.tel,'Hola '+x.quien.split(' ')[0]+', gracias por confiar en Air-Limp. ¿Nos dejas tu opinión en la app? Nos ayuda mucho.')}">Pedir reseña</a>`:''}
+    </div></div>`).join(''):'<div class="empty"><h3>Nada por aquí</h3><p class="small muted">Las solicitudes de los clientes aparecen en esta lista al momento.</p></div>';
+  const upd=(id,fn,msg)=>{const x=S.reqs.find(r=>r.id==id);const before=x.estado;fn(x);if(x.mine&&x.estado!==before){notify(msgFor(x),'solicitudes')}save();R['e-solicitudes']();if(msg)toast(msg)};
+  $$('[data-tec]').forEach(s=>s.onchange=()=>upd(s.dataset.tec,x=>{x.tecnico=s.value;if(s.value&&x.estado==='Recibida'){x.estado='Asignada';if(!x.dia)x.dia=ymd();if(!x.hora)x.hora='10:00'}},s.value?'Asignada a '+s.value:''));
+  $$('[data-dia]').forEach(s=>s.onchange=()=>upd(s.dataset.dia,x=>x.dia=s.value));
+  $$('[data-hora]').forEach(s=>s.onchange=()=>upd(s.dataset.hora,x=>x.hora=s.value));
+  $$('[data-est]').forEach(s=>s.onchange=()=>{const x=S.reqs.find(r=>r.id==s.dataset.est);if(s.value==='Terminada'&&!x.parte&&x.mine){s.value=x.estado;return parteForm(x)}
+    upd(s.dataset.est,x=>{x.estado=s.value;if(s.value!=='Recibida'&&!x.tecnico)x.tecnico=TECNICOS[0];if(!x.dia)x.dia=ymd();if(!x.hora&&s.value!=='Recibida')x.hora='10:00'},'Estado: '+s.value+(x.mine?' · el cliente recibe el aviso':''))});
+  $$('[data-parte]').forEach(b=>b.onclick=()=>parteForm(S.reqs.find(r=>r.id==b.dataset.parte)));
+  $$('[data-vparte]').forEach(b=>b.onclick=()=>parteView(S.reqs.find(r=>r.id==b.dataset.vparte)));
+  $$('[data-presu]').forEach(b=>b.onclick=()=>presuForm(S.reqs.find(r=>r.id==b.dataset.presu)));
+};
+function msgFor(x){if(x.estado==='Asignada')return `Hemos asignado tu solicitud "${x.titulo}" a ${x.tecnico}${x.hora?', el '+fmtDay(x.dia)+' a las '+x.hora:''}.`;
+  if(x.estado==='En camino')return `${x.tecnico} va de camino${x.hora?'. Llegada prevista sobre las '+x.hora:''}.`;
+  if(x.estado==='Terminada')return 'Trabajo terminado. Tienes el parte en Mis cosas. ¿Nos dejas una reseña?';return 'Tu solicitud ha cambiado de estado: '+x.estado}
+
+/* Parte de trabajo con firma */
+function sigPad(cv){const dpr=window.devicePixelRatio||1;cv.width=cv.offsetWidth*dpr;cv.height=cv.offsetHeight*dpr;const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.strokeStyle='#0F2A30';let dn=false,dirty=false;
+  const p=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  cv.onpointerdown=e=>{dn=true;dirty=true;cv.setPointerCapture(e.pointerId);ctx.beginPath();ctx.moveTo(...p(e))};
+  cv.onpointermove=e=>{if(!dn)return;ctx.lineTo(...p(e));ctx.stroke()};
+  cv.onpointerup=cv.onpointercancel=()=>dn=false;
+  return{clear(){ctx.clearRect(0,0,cv.width,cv.height);dirty=false},empty:()=>!dirty,data:()=>cv.toDataURL('image/png')}}
+function parteForm(x){openSheet(`<h2>Parte de trabajo</h2><p class="small muted" style="margin:6px 0 14px">${esc(x.titulo)} · ${esc(x.quien)}</p>
+  <label class="f">Técnico<select id="ptTec">${TECNICOS.map(t=>`<option ${t===x.tecnico?'selected':''}>${t}</option>`).join('')}</select></label>
+  <label class="f">Trabajo realizado<textarea id="ptT" placeholder="Por ejemplo: limpieza de desagüe y filtros, comprobación de presiones"></textarea></label>
+  <label class="f">Materiales<input type="text" id="ptM" placeholder="Opcional"></label>
+  <label class="f">Horas<input type="number" id="ptH" min="0.5" step="0.5" value="1"></label>
+  <div class="two-col"><label class="f">Fotos antes<input type="file" accept="image/*" multiple id="ptA"><div class="thumbs" id="ptAt"></div></label><label class="f">Fotos después<input type="file" accept="image/*" multiple id="ptD"><div class="thumbs" id="ptDt"></div></label></div>
+  <div class="f">Firma del cliente<canvas class="sig" id="sig"></canvas><button type="button" class="link small" id="sigC" style="justify-self:start">Borrar firma</button></div>
+  <button class="btn btn-ok btn-block" id="ptOk">Cerrar trabajo con firma</button>`);
+  const pad=sigPad($('#sig'));$('#sigC').onclick=()=>pad.clear();let A=[],D=[];
+  $('#ptA').onchange=async e=>{A=await readImgs(e.target);$('#ptAt').innerHTML=A.map(u=>`<img src="${u}" alt="">`).join('')};
+  $('#ptD').onchange=async e=>{D=await readImgs(e.target);$('#ptDt').innerHTML=D.map(u=>`<img src="${u}" alt="">`).join('')};
+  $('#ptOk').onclick=()=>{if(pad.empty())return toast('Falta la firma del cliente');
+    x.tecnico=$('#ptTec').value;x.parte={trabajo:$('#ptT').value,material:$('#ptM').value,horas:$('#ptH').value,antes:A,despues:D,firma:pad.data(),fecha:Date.now()};x.estado='Terminada';if(!x.dia)x.dia=ymd();
+    if(x.mine)notify(msgFor(x),'solicitudes');save();closeSheet();R['e-solicitudes']();toast('Trabajo cerrado. El cliente ya tiene su parte')}}
+
+/* Presupuesto PDF */
+function presuLinesDefault(x){const p=x.presu||{a:1000,b:1500};const tot=(p.a+p.b)/2/1.21;return[{c:'Equipo y materiales',i:Math.round(tot*.7)},{c:'Instalación y puesta en marcha',i:Math.round(tot*.3)}]}
+function presuDoc(x,lines){const base=lines.reduce((a,l)=>a+(+l.i||0),0),iva=base*.21;return `<div style="font-family:Figtree,system-ui,sans-serif;color:#0F2A30;max-width:720px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:3px solid #0F2A30;padding-bottom:14px"><div><img src="https://airlimp.com/img/logo.png" alt="Air-Limp" style="height:50px" onerror="this.outerHTML='<b style=&quot;font-size:24px&quot;>Air-Limp</b>'"><div style="font-size:12px;color:#5A7378;margin-top:6px">Polígono Ind. Mies de Molladar, Nave E26 · 39311 Cartes (Cantabria)<br>Tel. 942 890 424</div></div><div style="text-align:right"><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800">Presupuesto</div><div style="font-size:13px">Nº ${String(x.id).slice(-6)} · ${fmt(Date.now())}<br>Válido 30 días</div></div></div>
+  <div style="margin:16px 0;font-size:14px"><b>Cliente:</b> ${esc(x.quien)} · ${esc(x.tel)}${x.lugar?' · '+esc(x.lugar):''}<br><b>Trabajo:</b> ${esc(x.titulo)}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="background:#E4F1F0"><th style="text-align:left;padding:8px">Concepto</th><th style="text-align:right;padding:8px">Importe</th></tr></thead><tbody>${lines.map(l=>`<tr><td style="padding:8px;border-bottom:1px solid #CFE0DE">${esc(l.c)}</td><td style="padding:8px;border-bottom:1px solid #CFE0DE;text-align:right">${eur2(+l.i||0)}</td></tr>`).join('')}</tbody></table>
+  <div style="margin-left:auto;width:260px;font-size:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;padding:4px 0"><span>Base imponible</span><span>${eur2(base)}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0"><span>IVA 21 %</span><span>${eur2(iva)}</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #0F2A30;font-weight:800;font-size:17px"><span>Total</span><span>${eur2(base+iva)}</span></div></div>
+  <p style="font-size:12px;color:#5A7378;margin-top:20px">Incluye garantía del fabricante y de la instalación. Precios de ejemplo para la demostración.</p></div>`}
+function presuForm(x){let lines=x.presuFinal?x.presuFinal.lines.map(l=>({...l})):presuLinesDefault(x);
+  const draw=()=>{const base=lines.reduce((a,l)=>a+(+l.i||0),0);
+    openSheet(`<h2>Presupuesto</h2><p class="small muted" style="margin:6px 0 14px">${esc(x.titulo)} · ${esc(x.quien)}</p>
+    <table class="lines"><tbody>${lines.map((l,i)=>`<tr><td><input type="text" value="${esc(l.c)}" data-lc="${i}"></td><td class="num"><input type="number" value="${l.i}" data-li="${i}" style="text-align:right"></td><td style="width:30px"><button class="link" data-ld="${i}" aria-label="Quitar línea">✕</button></td></tr>`).join('')}</tbody></table>
+    <button class="link small" id="lAdd" style="margin:8px 0">＋ Añadir línea</button>
+    <div class="tot"><span>Base</span><span id="lBase">${eur2(base)}</span></div><div class="tot"><span>Total con IVA</span><span id="lTot">${eur2(base*1.21)}</span></div>
+    <div class="nav-row"><button class="btn btn-ghost" id="lPdf">Ver PDF</button><button class="btn btn-main" id="lSend">${x.mine?'Enviar al cliente':'Guardar'}</button></div>`);
+    $$('[data-lc]').forEach(i=>i.oninput=()=>lines[+i.dataset.lc].c=i.value);
+    $$('[data-li]').forEach(i=>i.oninput=()=>{lines[+i.dataset.li].i=+i.value||0;const b=lines.reduce((a,l)=>a+(+l.i||0),0);$('#lBase').textContent=eur2(b);$('#lTot').textContent=eur2(b*1.21)});
+    $$('[data-ld]').forEach(b=>b.onclick=()=>{lines.splice(+b.dataset.ld,1);draw()});
+    $('#lAdd').onclick=()=>{lines.push({c:'Nuevo concepto',i:0});draw()};
+    $('#lPdf').onclick=()=>showPdf(x,lines);
+    $('#lSend').onclick=()=>{const tot=lines.reduce((a,l)=>a+(+l.i||0),0)*1.21;x.presuFinal={lines,total:tot,fecha:Date.now()};x.aceptado=false;if(x.mine)notify('Tienes tu presupuesto: '+eur2(tot)+' con IVA. Puedes verlo y aceptarlo en Mis cosas.','solicitudes');save();closeSheet();R['e-solicitudes']();toast(x.mine?'Presupuesto enviado al cliente':'Presupuesto guardado')}};
+  draw()}
+function showPdf(x,lines){openSheet(`<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;font-size:.9rem">${presuDoc(x,lines)}</div><div class="nav-row"><button class="btn btn-ghost" id="pdfBack">Volver</button>${CANPRINT?'<button class="btn btn-main" id="pdfPrint">Imprimir o guardar PDF</button>':''}</div>`);
+  $('#pdfBack').onclick=()=>x.mine&&current==='solicitudes'?presuView(x,true):presuForm(x);
+  if($('#pdfPrint'))$('#pdfPrint').onclick=()=>{$('#printArea').innerHTML=presuDoc(x,lines);try{window.print()}catch(e){toast('Abre la web en el navegador para guardar en PDF')}}}
+function presuView(x){const lines=x.presuFinal.lines;openSheet(`<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;font-size:.9rem">${presuDoc(x,lines)}</div>
+  <div class="nav-row">${x.aceptado?'<span class="pill ok" style="padding:10px 14px">Aceptado. Te llamamos para fijar la instalación</span>':`${CANPRINT?'<button class="btn btn-ghost" id="pvPrint">Guardar PDF</button>':''}<button class="btn btn-ok" id="pvOk">Aceptar presupuesto</button>`}</div>`);
+  if(!x.aceptado){$('#pvOk').onclick=()=>{x.aceptado=true;save();closeSheet();R.solicitudes();toast('Presupuesto aceptado. Air-Limp ya lo ve en su panel')};if($('#pvPrint'))$('#pvPrint').onclick=()=>{$('#printArea').innerHTML=presuDoc(x,lines);try{window.print()}catch(e){toast('Abre la web en el navegador para guardar en PDF')}}}}
+
+/* Agenda */
+$('#agDay').value=ymd();$('#agDay').onchange=()=>R['e-agenda']();
+R['e-agenda']=()=>{const d=$('#agDay').value||ymd();
+  $('#lanes').innerHTML=TECNICOS.map(t=>{const st=S.reqs.filter(x=>x.tecnico===t&&x.dia===d).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+    const pts=st.length?st.map((s,i)=>[30+i*(240/Math.max(1,st.length-1||1)),40+((i*37)%50)]):[];
+    const svg=`<svg class="route" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 100c60-20 120 10 180-10s100-30 120-20" stroke="#fff" stroke-width="10" fill="none"/><circle cx="14" cy="105" r="7" fill="#0F2A30"/>${pts.length?`<path d="M14 105 ${pts.map(p=>'L'+p[0]+' '+p[1]).join(' ')}" stroke="#2AA3B6" stroke-width="3" fill="none" stroke-dasharray="6 5"/>`:''}${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="11" fill="${st[i].estado==='Terminada'?'#2E8B57':'#EC963A'}"/><text x="${p[0]}" y="${p[1]+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Figtree">${i+1}</text>`).join('')}</svg>`;
+    const url='https://www.google.com/maps/dir/'+['Polígono Mies de Molladar, Cartes',...st.filter(s=>s.estado!=='Terminada').map(s=>s.lugar)].map(z=>encodeURIComponent(z+', Cantabria')).join('/');
+    return `<div class="lane"><div class="card-top"><h3>${t}</h3><span class="pill">${st.length} visita${st.length===1?'':'s'}</span></div>${svg}
+      ${st.length?st.map((s,i)=>`<div class="stop"><b class="h">${s.hora||'—'}</b><div><b>${i+1}. ${esc(s.titulo)}</b><div class="small muted">${esc(s.quien)} · ${esc(s.lugar)}</div><span class="pill ${s.estado==='Terminada'?'ok':s.estado==='En camino'?'heat':''}" style="margin-top:4px">${s.estado}</span></div></div>`).join(''):'<p class="small muted">Sin visitas este día.</p>'}
+      ${st.some(s=>s.estado!=='Terminada')?`<a class="btn btn-sm btn-main" target="_blank" rel="noopener" href="${url}">Abrir ruta en Google Maps</a>`:''}</div>`}).join('')};
+
+/* Clientes */
+function clientes(){const m={};S.reqs.forEach(r=>{const k=r.tel||r.quien;if(!m[k])m[k]={nombre:r.quien,tel:r.tel,lugar:r.lugar,reqs:[],mine:r.mine};m[k].reqs.push(r);if(r.lugar)m[k].lugar=r.lugar});return Object.values(m)}
+R['e-clientes']=()=>{const q=norm($('#cliQ').value||'');const list=clientes().filter(c=>!q||norm(c.nombre+' '+c.tel+' '+c.lugar).includes(q));
+  $('#cliList').innerHTML=list.map((c,i)=>`<button class="card" style="text-align:left" data-cli="${esc(c.tel)}"><div class="card-top"><div><h3>${esc(c.nombre)}</h3><span class="small muted">${esc(c.tel)}${c.lugar?' · '+esc(c.lugar):''}</span></div><span class="pill">${c.reqs.length} solicitud${c.reqs.length>1?'es':''}</span></div></button>`).join('')||'<p class="muted">Sin resultados.</p>';
+  $$('[data-cli]').forEach(b=>b.onclick=()=>{const c=clientes().find(x=>x.tel===b.dataset.cli);const eq=c.mine?S.equipos:[];
+    openSheet(`<h2>${esc(c.nombre)}</h2><p class="muted small" style="margin:4px 0 14px">${esc(c.tel)}${c.lugar?' · '+esc(c.lugar):''}</p><div class="row" style="margin-bottom:16px"><a class="btn btn-sm btn-main" href="tel:${esc(c.tel.replace(/\s/g,''))}">Llamar</a><a class="btn btn-sm btn-wa" target="_blank" rel="noopener" href="${wa(c.tel,'Hola, te escribimos de Air-Limp.')}">WhatsApp</a></div>
+    <h3>Equipos</h3>${eq.length?eq.map(q=>`<p class="small" style="margin:6px 0">${esc(q.tipo)} · ${esc(q.marca||'Sin marca')}${q.modelo?' '+esc(q.modelo):''} · última revisión ${fmt(q.rev)}</p>`).join(''):'<p class="small muted" style="margin:6px 0">Sin equipos registrados en la app.</p>'}
+    <h3 style="margin-top:14px">Historial</h3>${c.reqs.map(r=>`<div class="stop" style="margin-top:8px"><span class="small muted">${fmt(r.fecha)}</span><div><b class="small">${esc(r.titulo)}</b><div><span class="pill ${r.estado==='Terminada'?'ok':''}">${r.estado}</span>${r.tecnico?' <span class="small muted">'+esc(r.tecnico)+'</span>':''}</div></div></div>`).join('')}`)})};
+$('#cliQ').oninput=()=>R['e-clientes']();
+
+/* Reseñas (empresa) */
+let erF='pendiente';
+R['e-resenas']=()=>{const F=[['pendiente','Por revisar'],['publicada','Publicadas'],['oculta','Ocultas']];
+  $('#erFilters').innerHTML=F.map(([k,n])=>`<button class="chip ${erF===k?'on':''}" data-er="${k}">${n} <span class="muted">${S.reviews.filter(r=>r.estado===k).length}</span></button>`).join('');
+  $$('[data-er]').forEach(b=>b.onclick=()=>{erF=b.dataset.er;R['e-resenas']()});
+  const list=S.reviews.filter(r=>r.estado===erF);
+  $('#erList').innerHTML=list.length?list.map(r=>`<div class="card"><div class="card-top"><span class="stars">${stars(r.stars)}</span>${r.reqId?'<span class="pill ok">Verificada: trabajo terminado</span>':'<span class="pill heat">Sin trabajo asociado: compruébala</span>'}</div><p>${esc(r.texto)}</p><span class="small muted">${esc(r.nombre)}${r.lugar?' · '+esc(r.lugar):''} · ${esc(r.servicio)} · ${ago(r.fecha)}</span>
+    <label class="f" style="margin:0">Respuesta pública (opcional)<textarea data-resp="${r.id}" placeholder="Gracias por confiar en nosotros…">${esc(r.respuesta)}</textarea></label>
+    <div class="row">${r.estado!=='publicada'?`<button class="btn btn-sm btn-ok" data-pub="${r.id}">Publicar</button>`:`<button class="btn btn-sm btn-main" data-pub="${r.id}">Guardar respuesta</button>`}${r.estado!=='oculta'?`<button class="btn btn-sm btn-ghost" data-hide="${r.id}">Ocultar</button>`:''}</div></div>`).join(''):`<div class="empty"><h3>${erF==='pendiente'?'No hay reseñas por revisar':'Nada por aquí'}</h3><p class="small muted">Cuando un cliente deje una reseña desde la app, aparecerá aquí para que la revises.</p></div>`;
+  $$('[data-pub]').forEach(b=>b.onclick=()=>{const r=S.reviews.find(x=>x.id==b.dataset.pub);r.respuesta=$(`[data-resp="${r.id}"]`).value;const was=r.estado;r.estado='publicada';if(r.mine&&was!=='publicada')notify('Tu reseña ya está publicada. ¡Gracias!','resenas');save();R['e-resenas']();toast(was==='publicada'?'Respuesta guardada':'Reseña publicada en la app')});
+  $$('[data-hide]').forEach(b=>b.onclick=()=>{S.reviews.find(x=>x.id==b.dataset.hide).estado='oculta';save();R['e-resenas']();toast('Reseña ocultada')})};
+
+/* Contenido */
+R['e-contenido']=()=>{$('#pOn').checked=S.promo.on;$('#pT').value=S.promo.t;$('#pX').value=S.promo.x;
+  $('#oList').innerHTML=S.obras.map((o,i)=>`<div class="row" style="flex-wrap:nowrap"><img src="${o.foto}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px"><span class="small grow">${esc(o.t)}</span><button class="link small" data-odel="${i}">Quitar</button></div>`).join('');
+  $$('[data-odel]').forEach(b=>b.onclick=()=>{S.obras.splice(+b.dataset.odel,1);save();R['e-contenido']()});
+  $('#ctList').innerHTML=S.contratos.length?S.contratos.map(c=>`<div class="req contrato"><div class="req-top"><b>Plan ${esc(c.plan)} · ${esc(c.n)} equipo(s)</b><span class="pill heat">${esc(c.estado)}</span></div><span class="small">${esc(c.nombre)} · ${esc(c.tel)}${c.lugar?' · '+esc(c.lugar):''} · ${c.precio?c.precio+' €/año':'A medida'}</span><div class="row"><button class="btn btn-sm btn-ok" data-ctok="${c.id}">Marcar como firmado</button></div></div>`).join(''):'<p class="muted small">Cuando un cliente contrate un plan desde la app, aparecerá aquí.</p>';
+  $$('[data-ctok]').forEach(b=>b.onclick=()=>{const c=S.contratos.find(x=>x.id==b.dataset.ctok);c.estado='Activo';save();R['e-contenido']();toast('Contrato activo')})};
+$('#pSave').onclick=()=>{S.promo={on:$('#pOn').checked,t:$('#pT').value,x:$('#pX').value};save();toast('Promoción guardada. Ya la ven los clientes')};
+$('#oSave').onclick=async()=>{const f=$('#oF').files[0];if(!f)return toast('Elige una foto');const foto=await compress(f,900);if(!foto)return toast('No se pudo leer la foto');
+  S.obras.unshift({foto,t:$('#oT').value||'Obra realizada',k:$('#oK').value,l:$('#oL').value});save();$('#oF').value='';$('#oT').value='';$('#oL').value='';R['e-contenido']();toast('Obra publicada en la app')};
+
+/* =========================================================
+   ARRANQUE
+   ========================================================= */
+applyLang();badges();checkTour();
+const start=location.hash.slice(1);go(MODE==='empresa'?'e-inicio':start&&$('#v-'+start)&&!start.startsWith('e-')?start:(MODE==='cliente'?'inicio':'portada'));
+</script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{})}</script>
+</body>
+</html>
